@@ -206,9 +206,6 @@
   <ItemGroup>
     <None Include="res\GXMusic.rc2" />
   </ItemGroup>
-  <ItemGroup>
-    <Image Include="res\GXMusic.ico" />
-  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
