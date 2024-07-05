@@ -17,9 +17,12 @@ public:
 	enum { IDD = IDD_GXMUSIC_DIALOG };
 #endif
 
-	protected:
-	virtual void DoDataExchange(CDataExchange* pDX);	// DDX/DDV 支持
 
+private:
+
+
+protected:
+	virtual void DoDataExchange(CDataExchange* pDX);	// DDX/DDV 支持
 
 // 实现
 protected:
