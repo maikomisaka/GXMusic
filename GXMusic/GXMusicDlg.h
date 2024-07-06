@@ -19,7 +19,9 @@ public:
 
 
 private:
+	CImage m_bgImage; // 用于加载背景图片
 
+	void SetBackgroundAndTransparency(BYTE alpha);
 
 protected:
 	virtual void DoDataExchange(CDataExchange* pDX);	// DDX/DDV 支持

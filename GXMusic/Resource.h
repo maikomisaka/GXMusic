@@ -7,8 +7,6 @@
 #define IDS_ABOUTBOX                    101
 #define IDD_GXMUSIC_DIALOG              102
 #define IDR_MAINFRAME                   128
-#define IDB_BITMAP1                     129
-#define IDB_GX_APP_BACKGROUND           129
 
 // Next default values for new objects
 // 

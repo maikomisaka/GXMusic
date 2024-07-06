@@ -100,7 +100,7 @@ BOOL CGXMusicDlg::OnInitDialog()
 	SetIcon(m_hIcon, FALSE);		// 设置小图标
 
 	// Background setting
-	
+	m_bgImage.Load(_T(".\\res\\GX_App_Background.png"));
 
 
 	return TRUE;  // 除非将焦点设置到控件，否则返回 TRUE
@@ -123,11 +123,6 @@ void CGXMusicDlg::OnSysCommand(UINT nID, LPARAM lParam)
 //  来绘制该图标。  对于使用文档/视图模型的 MFC 应用程序，
 //  这将由框架自动完成。
 
-void CGXMusicDlg::OnPaint()
-{
-	CDialogEx::OnPaint();
-}
-
 //当用户拖动最小化窗口时系统调用此函数取得光标
 //显示。
 HCURSOR CGXMusicDlg::OnQueryDragIcon()
@@ -135,3 +130,63 @@ HCURSOR CGXMusicDlg::OnQueryDragIcon()
 	return static_cast<HCURSOR>(m_hIcon);
 }
 
+void CGXMusicDlg::OnPaint()
+{
+	if (IsIconic())
+	{
+		CPaintDC dc(this); // device context for painting
+
+		SendMessage(WM_ICONERASEBKGND, reinterpret_cast<WPARAM>(dc.GetSafeHdc()), 0);
+
+		// Center icon in client rectangle
+		int cxIcon = GetSystemMetrics(SM_CXICON);
+		int cyIcon = GetSystemMetrics(SM_CYICON);
+		CRect rect;
+		GetClientRect(&rect);
+		int x = (rect.Width() - cxIcon + 1) / 2;
+		int y = (rect.Height() - cyIcon + 1) / 2;
+
+		// Draw the icon
+		dc.DrawIcon(x, y, m_hIcon);
+	}
+	else
+	{
+		BYTE alpha = 200;	// 0-255
+		SetBackgroundAndTransparency(alpha);
+		
+	}
+}
+
+
+void CGXMusicDlg::SetBackgroundAndTransparency(BYTE alpha)
+{
+	CPaintDC dc(this); // device context for painting
+
+	// 获取客户区尺寸
+	CRect rect;
+	GetClientRect(&rect);
+
+	// 创建一个内存 DC
+	CDC memDC;
+	memDC.CreateCompatibleDC(&dc);
+
+	// 创建一个兼容的位图
+	CBitmap bmp;
+	bmp.CreateCompatibleBitmap(&dc, rect.Width(), rect.Height());
+	CBitmap* pOldBmp = memDC.SelectObject(&bmp);
+
+	// 绘制背景图片
+	m_bgImage.Draw(memDC.GetSafeHdc(), 0, 0, rect.Width(), rect.Height());
+
+	// 设置透明度（假设透明度为 128，即 50% 透明）
+	BLENDFUNCTION bf;
+	bf.BlendOp = AC_SRC_OVER;
+	bf.BlendFlags = 0;
+	bf.SourceConstantAlpha = alpha; // 透明度值 (0-255)
+	bf.AlphaFormat = 0;
+
+	// 将内存 DC 中的内容拷贝到屏幕 DC
+	dc.AlphaBlend(0, 0, rect.Width(), rect.Height(), &memDC, 0, 0, rect.Width(), rect.Height(), bf);
+
+	memDC.SelectObject(pOldBmp);
+}
