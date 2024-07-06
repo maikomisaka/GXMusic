@@ -65,6 +65,7 @@ BEGIN_MESSAGE_MAP(CGXMusicDlg, CDialogEx)
 	ON_WM_SYSCOMMAND()
 	ON_WM_PAINT()
 	ON_WM_QUERYDRAGICON()
+	ON_WM_NCHITTEST()
 END_MESSAGE_MAP()
 
 
@@ -189,4 +190,17 @@ void CGXMusicDlg::SetBackgroundAndTransparency(BYTE alpha)
 	dc.AlphaBlend(0, 0, rect.Width(), rect.Height(), &memDC, 0, 0, rect.Width(), rect.Height(), bf);
 
 	memDC.SelectObject(pOldBmp);
+}
+
+LRESULT CGXMusicDlg::OnNcHitTest(CPoint point) {
+	// trans screen coordinate to client coordinate
+	ScreenToClient(&point);
+
+	// define region for window dragging
+	CRect dragRegion;
+	GetClientRect(&dragRegion);
+	if (point.y >= 0 && point.y <= 30) {
+		return HTCAPTION;
+	}
+	return CDialogEx::OnNcHitTest(point);
 }
