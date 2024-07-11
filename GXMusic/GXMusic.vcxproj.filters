@@ -33,6 +33,9 @@
     <ClInclude Include="pch.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="TransparentButton.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="GXMusic.cpp">
@@ -42,6 +45,9 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="pch.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="TransparentButton.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>
@@ -60,6 +66,15 @@
       <Filter>资源文件</Filter>
     </Image>
     <Image Include="res\GX_App_Background.bmp">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="res\GX_App_Close.png">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="res\GX_App_Close.ico">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="res\GX_App_Close.bmp">
       <Filter>资源文件</Filter>
     </Image>
   </ItemGroup>

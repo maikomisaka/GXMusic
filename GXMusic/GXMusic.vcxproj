@@ -190,6 +190,7 @@
     <ClInclude Include="pch.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="targetver.h" />
+    <ClInclude Include="TransparentButton.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="GXMusic.cpp" />
@@ -200,6 +201,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="TransparentButton.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="GXMusic.rc" />
@@ -210,6 +212,9 @@
   <ItemGroup>
     <Image Include="res\GXMusic.ico" />
     <Image Include="res\GX_App_Background.bmp" />
+    <Image Include="res\GX_App_Close.bmp" />
+    <Image Include="res\GX_App_Close.ico" />
+    <Image Include="res\GX_App_Close.png" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

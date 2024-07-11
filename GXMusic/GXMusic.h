@@ -23,6 +23,11 @@ public:
 // 重写
 public:
 	virtual BOOL InitInstance();
+	virtual int ExitInstance();
+
+private:
+	Gdiplus::GdiplusStartupInput gdiplusStartupInput;
+	ULONG_PTR gdiplusToken;
 
 // 实现
 

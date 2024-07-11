@@ -1,6 +1,7 @@
 ﻿
 // GXMusicDlg.h: 头文件
 //
+#include "TransparentButton.h"
 
 #pragma once
 
@@ -20,6 +21,7 @@ public:
 
 private:
 	CImage m_bgImage; // 用于加载背景图片
+	CTransparentButton m_CloseButton;
 
 	void SetBackgroundAndTransparency(BYTE alpha);
 
@@ -36,5 +38,6 @@ protected:
 	afx_msg void OnPaint();
 	afx_msg HCURSOR OnQueryDragIcon();
 	afx_msg LRESULT OnNcHitTest(CPoint point);
+	afx_msg void OnCloseButtonClicked();
 	DECLARE_MESSAGE_MAP()
 };

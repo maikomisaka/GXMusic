@@ -59,6 +59,7 @@ CGXMusicDlg::CGXMusicDlg(CWnd* pParent /*=nullptr*/)
 void CGXMusicDlg::DoDataExchange(CDataExchange* pDX)
 {
 	CDialogEx::DoDataExchange(pDX);
+	DDX_Control(pDX, IDC_GX_MAIN_CLOSE, m_CloseButton);
 }
 
 BEGIN_MESSAGE_MAP(CGXMusicDlg, CDialogEx)
@@ -66,6 +67,8 @@ BEGIN_MESSAGE_MAP(CGXMusicDlg, CDialogEx)
 	ON_WM_PAINT()
 	ON_WM_QUERYDRAGICON()
 	ON_WM_NCHITTEST()
+	ON_WM_CTLCOLOR()
+	ON_BN_CLICKED(IDC_GX_MAIN_CLOSE, OnCloseButtonClicked)	
 END_MESSAGE_MAP()
 
 
@@ -103,6 +106,11 @@ BOOL CGXMusicDlg::OnInitDialog()
 	// Background setting
 	m_bgImage.Load(_T(".\\res\\GX_App_Background.png"));
 
+	// 加载PNG图片
+	if (!m_CloseButton.LoadPngImage(IDB_GX_APP_CLOSE))
+	{
+		AfxMessageBox(_T("Failed to load PNG image!"));
+	}
 
 	return TRUE;  // 除非将焦点设置到控件，否则返回 TRUE
 }
@@ -203,4 +211,9 @@ LRESULT CGXMusicDlg::OnNcHitTest(CPoint point) {
 		return HTCAPTION;
 	}
 	return CDialogEx::OnNcHitTest(point);
+}
+
+void CGXMusicDlg::OnCloseButtonClicked()
+{
+	EndDialog(IDCANCEL);
 }
