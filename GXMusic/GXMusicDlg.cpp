@@ -106,11 +106,8 @@ BOOL CGXMusicDlg::OnInitDialog()
 	// Background setting
 	m_bgImage.Load(_T(".\\res\\GX_App_Background.png"));
 
-	// 加载PNG图片
-	if (!m_CloseButton.LoadPngImage(IDB_GX_APP_CLOSE))
-	{
-		AfxMessageBox(_T("Failed to load PNG image!"));
-	}
+	m_CloseButton.SetNormalImage(IDB_GX_APP_CLOSE);
+	m_CloseButton.SetHoverImage(IDB_GX_APP_CLOSE_HOVER);
 
 	return TRUE;  // 除非将焦点设置到控件，否则返回 TRUE
 }
