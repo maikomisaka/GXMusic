@@ -71,10 +71,19 @@
     <Image Include="res\GX_App_Close.png">
       <Filter>资源文件</Filter>
     </Image>
-    <Image Include="res\GX_App_Close.ico">
+    <Image Include="res\GX_App_Close_Hover.png">
       <Filter>资源文件</Filter>
     </Image>
-    <Image Include="res\GX_App_Close.bmp">
+    <Image Include="res\GX_App_Maximize.png">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="res\GX_App_Maximize_Hover.png">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="res\GX_App_Minimize.png">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="res\GX_App_Minimize_Hover.png">
       <Filter>资源文件</Filter>
     </Image>
   </ItemGroup>

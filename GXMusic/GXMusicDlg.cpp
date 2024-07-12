@@ -60,6 +60,8 @@ void CGXMusicDlg::DoDataExchange(CDataExchange* pDX)
 {
 	CDialogEx::DoDataExchange(pDX);
 	DDX_Control(pDX, IDC_GX_MAIN_CLOSE, m_CloseButton);
+	DDX_Control(pDX, IDC_GX_MAIN_MAX, m_MaximizeButton);
+	DDX_Control(pDX, IDC_GX_MAIN_MIN, m_MinimizeButton);
 }
 
 BEGIN_MESSAGE_MAP(CGXMusicDlg, CDialogEx)
@@ -106,8 +108,12 @@ BOOL CGXMusicDlg::OnInitDialog()
 	// Background setting
 	m_bgImage.Load(_T(".\\res\\GX_App_Background.png"));
 
-	m_CloseButton.SetNormalImage(IDB_GX_APP_CLOSE);
-	m_CloseButton.SetHoverImage(IDB_GX_APP_CLOSE_HOVER);
+	m_CloseButton.SetNormalImage(IDB_GX_MAIN_CLOSE);
+	m_CloseButton.SetHoverImage(IDB_GX_MAIN_CLOSE_HOVER);
+	m_MaximizeButton.SetNormalImage(IDB_GX_MAIN_MAX);
+	m_MaximizeButton.SetHoverImage(IDB_GX_MAIN_MAX_HOVER);
+	m_MinimizeButton.SetNormalImage(IDB_GX_MAIN_MIN);
+	m_MinimizeButton.SetHoverImage(IDB_GX_MAIN_MIN_HOVER);
 
 	return TRUE;  // 除非将焦点设置到控件，否则返回 TRUE
 }
@@ -157,7 +163,7 @@ void CGXMusicDlg::OnPaint()
 	}
 	else
 	{
-		BYTE alpha = 200;	// 0-255
+		BYTE alpha = 255;	// 0-255
 		SetBackgroundAndTransparency(alpha);
 		
 	}

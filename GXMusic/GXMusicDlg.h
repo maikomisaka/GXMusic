@@ -22,6 +22,8 @@ public:
 private:
 	CImage m_bgImage; // 用于加载背景图片
 	CTransparentButton m_CloseButton;
+	CTransparentButton m_MaximizeButton;
+	CTransparentButton m_MinimizeButton;
 
 	void SetBackgroundAndTransparency(BYTE alpha);
 
