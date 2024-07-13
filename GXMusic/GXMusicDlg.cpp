@@ -126,6 +126,8 @@ BOOL CGXMusicDlg::OnInitDialog()
 	m_imageIcon.SubclassDlgItem(IDC_GX_MAIN_ICON, this);
 	m_imageIcon.SetImage(_T(".\\res\\GX_Music_Icon.png"));
 	m_staticTitle.SubclassDlgItem(IDC_GX_MAIN_TITLE, this);
+	// Transparent Block Setting
+	m_blockMain.SubclassDlgItem(IDC_GX_MAIN_BLOCK, this);
 
 	return TRUE;  // 除非将焦点设置到控件，否则返回 TRUE
 }
@@ -169,7 +171,7 @@ void CGXMusicDlg::OnPaint()
 	}
 	else
 	{
-		BYTE alpha = 222;	// 0-255
+		BYTE alpha = 255;	// 0-255
 		SetBackgroundAndTransparency(alpha);
 		
 	}

@@ -1,12 +1,11 @@
 ﻿
 // GXMusicDlg.h: 头文件
 //
+#pragma once
 #include "TransparentButton.h"
 #include "TransparentImage.h"
 #include "TransparentStatic.h"
-
-#pragma once
-
+#include "CTransparentColorBlock.h"
 
 // CGXMusicDlg 对话框
 class CGXMusicDlg : public CDialogEx
@@ -31,6 +30,7 @@ private:
 	HCURSOR m_hHandCursor;  // 手形光标
 	TransparentImage m_imageIcon;
 	TransparentStatic m_staticTitle; // GX Music
+	CTransparentColorBlock m_blockMain;
 
 	void SetBackgroundAndTransparency(BYTE alpha);
 

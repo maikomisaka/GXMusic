@@ -18,6 +18,7 @@
 #define IDB_GX_MAIN_MIN_HOVER           208
 #define IDC_GX_MAIN_ICON                209
 #define IDC_GX_MAIN_TITLE               210
+#define IDC_GX_MAIN_BLOCK               211
 
 // Next default values for new objects
 // 
