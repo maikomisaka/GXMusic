@@ -114,6 +114,31 @@ BOOL CGXMusicDlg::OnInitDialog()
 	SetIcon(m_hIcon, TRUE);			// 设置大图标
 	SetIcon(m_hIcon, FALSE);		// 设置小图标
 
+	// init control ids
+	m_vecControlIDs = {
+		IDC_GX_MAIN_CLOSE,
+		IDC_GX_MAIN_MAX,
+		IDC_GX_MAIN_MIN,
+		IDC_GX_MAIN_ICON,
+		IDC_GX_MAIN_TITLE
+	};
+	for (int id : m_vecControlIDs) {
+		CRect rect;
+		GetDlgItem(id)->GetWindowRect(&rect);
+		ScreenToClient(&rect);
+		m_vecControlRects.push_back(rect);
+	}
+	m_vecScaleControlIDs = {
+		IDC_GX_MAIN_BLOCK
+	};
+	for (int id : m_vecScaleControlIDs) {
+		CRect rect;
+		GetDlgItem(id)->GetWindowRect(&rect);
+		ScreenToClient(&rect);
+		m_vecScaleControlRects.push_back(rect);
+	}
+	GetClientRect(&m_initialDialogRect);
+
 	// Background setting
 	m_bgImage.Load(_T(".\\res\\GX_App_Background.png"));
 	// 设置窗口区域为圆角
@@ -277,5 +302,39 @@ void CGXMusicDlg::OnSize(UINT nType, int cx, int cy)
 		// 更新窗口区域为圆角
 		SetWindowRgn(CreateRoundRectRgn(0, 0, cx, cy, 20, 20), TRUE);
 		Invalidate();
+
+		CRect rectClient;
+		GetClientRect(&rectClient);
+
+		// 计算宽度和高度的比例
+		double widthRatio = static_cast<double>(rectClient.Width()) / m_initialDialogRect.Width();
+		double heightRatio = static_cast<double>(rectClient.Height()) / m_initialDialogRect.Height();
+
+		// 调整控件的位置
+		for (size_t i = 0; i < m_vecControlIDs.size(); ++i)
+		{
+			CRect rcNew = m_vecControlRects[i];
+
+			// 根据比例调整控件位置
+			rcNew.left = static_cast<int>(m_vecControlRects[i].left * widthRatio);
+			rcNew.top = static_cast<int>(m_vecControlRects[i].top * heightRatio);
+			rcNew.right = rcNew.left + m_vecControlRects[i].Width();
+			rcNew.bottom = rcNew.top + m_vecControlRects[i].Height();
+
+			GetDlgItem(m_vecControlIDs[i])->MoveWindow(rcNew);
+		}
+		// 调整控件的位置和大小
+		for (size_t i = 0; i < m_vecScaleControlIDs.size(); ++i)
+		{
+			CRect rcNew = m_vecScaleControlRects[i];
+
+			// 根据比例调整控件位置和大小
+			rcNew.left = static_cast<int>(m_vecScaleControlRects[i].left * widthRatio);
+			rcNew.top = static_cast<int>(m_vecScaleControlRects[i].top * heightRatio);
+			rcNew.right = static_cast<int>(m_vecScaleControlRects[i].right * widthRatio);
+			rcNew.bottom = static_cast<int>(m_vecScaleControlRects[i].bottom * heightRatio);
+
+			GetDlgItem(m_vecScaleControlIDs[i])->MoveWindow(rcNew);
+		}
 	}
 }

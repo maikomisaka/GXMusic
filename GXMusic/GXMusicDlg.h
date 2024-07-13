@@ -7,6 +7,8 @@
 #include "TransparentStatic.h"
 #include "CTransparentColorBlock.h"
 
+#include <vector>
+
 // CGXMusicDlg 对话框
 class CGXMusicDlg : public CDialogEx
 {
@@ -31,6 +33,11 @@ private:
 	TransparentImage m_imageIcon;
 	TransparentStatic m_staticTitle; // GX Music
 	CTransparentColorBlock m_blockMain;
+	std::vector<CRect> m_vecControlRects;
+	std::vector<int> m_vecControlIDs;
+	std::vector<CRect> m_vecScaleControlRects;
+	std::vector<int> m_vecScaleControlIDs;
+	CRect m_initialDialogRect;
 
 	void SetBackgroundAndTransparency(BYTE alpha);
 
