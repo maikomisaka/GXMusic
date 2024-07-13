@@ -39,6 +39,9 @@
     <ClInclude Include="TransparentImage.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="TransparentStatic.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="GXMusic.cpp">
@@ -54,6 +57,9 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="TransparentImage.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="TransparentStatic.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

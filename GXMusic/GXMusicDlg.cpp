@@ -125,6 +125,7 @@ BOOL CGXMusicDlg::OnInitDialog()
 
 	m_imageIcon.SubclassDlgItem(IDC_GX_MAIN_ICON, this);
 	m_imageIcon.SetImage(_T(".\\res\\GX_Music_Icon.png"));
+	m_staticTitle.SubclassDlgItem(IDC_GX_MAIN_TITLE, this);
 
 	return TRUE;  // 除非将焦点设置到控件，否则返回 TRUE
 }

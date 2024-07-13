@@ -3,6 +3,7 @@
 //
 #include "TransparentButton.h"
 #include "TransparentImage.h"
+#include "TransparentStatic.h"
 
 #pragma once
 
@@ -29,6 +30,7 @@ private:
 	BOOL			   m_bIsWindowMaximized;	// for maximize window
 	HCURSOR m_hHandCursor;  // 手形光标
 	TransparentImage m_imageIcon;
+	TransparentStatic m_staticTitle; // GX Music
 
 	void SetBackgroundAndTransparency(BYTE alpha);
 
