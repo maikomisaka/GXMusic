@@ -75,6 +75,7 @@ BEGIN_MESSAGE_MAP(CGXMusicDlg, CDialogEx)
 	ON_BN_CLICKED(IDC_GX_MAIN_CLOSE, OnMainButtonClicked)	
 	ON_BN_CLICKED(IDC_GX_MAIN_MAX, OnMainButtonClicked)
 	ON_BN_CLICKED(IDC_GX_MAIN_MIN, OnMainButtonClicked)
+	ON_WM_GETMINMAXINFO()
 END_MESSAGE_MAP()
 
 
@@ -234,4 +235,19 @@ void CGXMusicDlg::OnMainButtonClicked()
 	else if (nID == IDC_GX_MAIN_MIN) {
 		ShowWindow(SW_MINIMIZE);
 	}
+}
+
+void CGXMusicDlg::OnGetMinMaxInfo(MINMAXINFO* lpMMI)
+{
+	CDialogEx::OnGetMinMaxInfo(lpMMI);
+
+	// 获取工作区大小
+	RECT rcWorkArea;
+	SystemParametersInfo(SPI_GETWORKAREA, 0, &rcWorkArea, 0);
+
+	// 设置最大尺寸和最大位置
+	lpMMI->ptMaxPosition.x = rcWorkArea.left;
+	lpMMI->ptMaxPosition.y = rcWorkArea.top;
+	lpMMI->ptMaxSize.x = rcWorkArea.right - rcWorkArea.left;
+	lpMMI->ptMaxSize.y = rcWorkArea.bottom - rcWorkArea.top;
 }

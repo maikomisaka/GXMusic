@@ -43,5 +43,6 @@ protected:
 	afx_msg HCURSOR OnQueryDragIcon();
 	afx_msg LRESULT OnNcHitTest(CPoint point);
 	afx_msg void OnMainButtonClicked();
+	afx_msg void OnGetMinMaxInfo(MINMAXINFO* lpMMI);
 	DECLARE_MESSAGE_MAP()
 };
