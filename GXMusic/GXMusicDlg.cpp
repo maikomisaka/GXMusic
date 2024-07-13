@@ -65,6 +65,9 @@ void CGXMusicDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_GX_MAIN_CLOSE, m_CloseButton);
 	DDX_Control(pDX, IDC_GX_MAIN_MAX, m_MaximizeButton);
 	DDX_Control(pDX, IDC_GX_MAIN_MIN, m_MinimizeButton);
+	DDX_Control(pDX, IDC_GX_MAIN_ICON, m_imageIcon);
+	DDX_Control(pDX, IDC_GX_MAIN_TITLE, m_staticTitle);
+	DDX_Control(pDX, IDC_GX_MAIN_BLOCK, m_blockMain);
 }
 
 BEGIN_MESSAGE_MAP(CGXMusicDlg, CDialogEx)
@@ -140,7 +143,7 @@ BOOL CGXMusicDlg::OnInitDialog()
 	GetClientRect(&m_initialDialogRect);
 
 	// Background setting
-	m_bgImage.Load(_T(".\\res\\GX_App_Background.png"));
+	m_backgroundImage.Load(_T(".\\res\\GX_App_Background.png"));
 	// 设置窗口区域为圆角
 	CRect rect;
 	GetWindowRect(&rect);
@@ -154,12 +157,7 @@ BOOL CGXMusicDlg::OnInitDialog()
 	m_MinimizeButton.SetNormalImage(IDB_GX_MAIN_MIN);
 	m_MinimizeButton.SetHoverImage(IDB_GX_MAIN_MIN_HOVER);
 
-	m_imageIcon.SubclassDlgItem(IDC_GX_MAIN_ICON, this);
 	m_imageIcon.SetImage(_T(".\\res\\GX_Music_Icon.png"));
-	m_staticTitle.SubclassDlgItem(IDC_GX_MAIN_TITLE, this);
-
-	// Transparent Block Setting
-	m_blockMain.SubclassDlgItem(IDC_GX_MAIN_BLOCK, this);
 
 	return TRUE;  // 除非将焦点设置到控件，否则返回 TRUE
 }
@@ -206,7 +204,7 @@ void CGXMusicDlg::SetBackgroundAndTransparency(BYTE alpha)
 	CBitmap* pOldBmp = memDC.SelectObject(&bmp);
 
 	// 绘制背景图片
-	m_bgImage.Draw(memDC.GetSafeHdc(), 0, 0, rect.Width(), rect.Height());
+	m_backgroundImage.Draw(memDC.GetSafeHdc(), 0, 0, rect.Width(), rect.Height());
 
 	// 设置透明度（假设透明度为 128，即 50% 透明）
 	BLENDFUNCTION bf;
@@ -222,6 +220,8 @@ void CGXMusicDlg::SetBackgroundAndTransparency(BYTE alpha)
 }
 
 LRESULT CGXMusicDlg::OnNcHitTest(CPoint point) {
+	if (!::IsWindow(m_hWnd))
+		return HTERROR;
 	// trans screen coordinate to client coordinate
 	ScreenToClient(&point);
 
@@ -274,6 +274,53 @@ void CGXMusicDlg::OnGetMinMaxInfo(MINMAXINFO* lpMMI)
 
 BOOL CGXMusicDlg::OnEraseBkgnd(CDC* pDC)
 {
+	// 获取当前对话框的客户区大小
+	CRect rectClient;
+	GetClientRect(&rectClient);
+
+	if (m_backgroundImage)
+	{
+		// 获取图片的尺寸
+		int imgWidth = m_backgroundImage.GetWidth();
+		int imgHeight = m_backgroundImage.GetHeight();
+
+		// 计算客户区和图片的比例
+		double clientRatio = static_cast<double>(rectClient.Width()) / rectClient.Height();
+		double imgRatio = static_cast<double>(imgWidth) / imgHeight;
+
+		// 定义裁剪源矩形区域，保持与最大化窗口一致的比例
+		CRect srcRect;
+		if (clientRatio > imgRatio)
+		{
+			srcRect.right = imgWidth;
+			srcRect.bottom = static_cast<int>(imgWidth / clientRatio);
+			srcRect.left = 0;
+			srcRect.top = 0;
+		}
+		else
+		{
+			srcRect.bottom = imgHeight;
+			srcRect.right = static_cast<int>(imgHeight * clientRatio);
+			srcRect.top = 0;
+			srcRect.left = 0;
+		}
+
+		// 使用 StretchBlt 将裁剪后的图片缩放并绘制到屏幕 DC
+		CDC memDC;
+		memDC.CreateCompatibleDC(pDC);
+		CBitmap bitmap;
+		bitmap.CreateCompatibleBitmap(pDC, srcRect.right, srcRect.bottom);
+		CBitmap* pOldBitmap = memDC.SelectObject(&bitmap);
+
+		m_backgroundImage.Draw(memDC.m_hDC, 0, 0);
+
+		pDC->StretchBlt(rectClient.left, rectClient.top, rectClient.Width(), rectClient.Height(),
+			&memDC, srcRect.left, srcRect.top, srcRect.Width(), srcRect.Height(), SRCCOPY);
+
+		memDC.SelectObject(pOldBitmap);
+	}
+
+	
 	return TRUE;
 }
 
@@ -301,7 +348,6 @@ void CGXMusicDlg::OnSize(UINT nType, int cx, int cy)
 	{
 		// 更新窗口区域为圆角
 		SetWindowRgn(CreateRoundRectRgn(0, 0, cx, cy, 20, 20), TRUE);
-		Invalidate();
 
 		CRect rectClient;
 		GetClientRect(&rectClient);
@@ -336,5 +382,7 @@ void CGXMusicDlg::OnSize(UINT nType, int cx, int cy)
 
 			GetDlgItem(m_vecScaleControlIDs[i])->MoveWindow(rcNew);
 		}
+
+		Invalidate();
 	}
 }
