@@ -76,6 +76,7 @@ BEGIN_MESSAGE_MAP(CGXMusicDlg, CDialogEx)
 	ON_BN_CLICKED(IDC_GX_MAIN_MAX, OnMainButtonClicked)
 	ON_BN_CLICKED(IDC_GX_MAIN_MIN, OnMainButtonClicked)
 	ON_WM_GETMINMAXINFO()
+	ON_WM_ERASEBKGND()
 END_MESSAGE_MAP()
 
 
@@ -162,7 +163,7 @@ void CGXMusicDlg::OnPaint()
 	}
 	else
 	{
-		BYTE alpha = 255;	// 0-255
+		BYTE alpha = 222;	// 0-255
 		SetBackgroundAndTransparency(alpha);
 		
 	}
@@ -250,4 +251,9 @@ void CGXMusicDlg::OnGetMinMaxInfo(MINMAXINFO* lpMMI)
 	lpMMI->ptMaxPosition.y = rcWorkArea.top;
 	lpMMI->ptMaxSize.x = rcWorkArea.right - rcWorkArea.left;
 	lpMMI->ptMaxSize.y = rcWorkArea.bottom - rcWorkArea.top;
+}
+
+BOOL CGXMusicDlg::OnEraseBkgnd(CDC* pDC)
+{
+	return TRUE;
 }
