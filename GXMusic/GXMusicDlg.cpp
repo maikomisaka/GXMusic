@@ -182,8 +182,38 @@ HCURSOR CGXMusicDlg::OnQueryDragIcon()
 
 void CGXMusicDlg::OnPaint()
 {
-	BYTE alpha = 255;	// 0-255
-	SetBackgroundAndTransparency(alpha);
+	//BYTE alpha = 255;	// 0-255
+	//SetBackgroundAndTransparency(alpha);
+	CRect rectClient;
+	GetClientRect(&rectClient);
+
+	CPaintDC dc(this); // 用于绘制的设备上下文
+	if (!m_backgroundImage.IsNull())
+	{
+		int imgWidth = m_backgroundImage.GetWidth();
+		int imgHeight = m_backgroundImage.GetHeight();
+		int dlgWidth = rectClient.Width();
+		int dlgHeight = rectClient.Height();
+
+		float imgAspect = static_cast<float>(imgWidth) / imgHeight;
+		float dlgAspect = static_cast<float>(dlgWidth) / dlgHeight;
+
+		CRect sourceRect;
+		if (imgAspect > dlgAspect)
+		{
+			int newWidth = static_cast<int>(imgHeight * dlgAspect);
+			int offsetX = (imgWidth - newWidth) / 2;
+			sourceRect = CRect(offsetX, 0, offsetX + newWidth, imgHeight);
+		}
+		else
+		{
+			int newHeight = static_cast<int>(imgWidth / dlgAspect);
+			int offsetY = (imgHeight - newHeight) / 2;
+			sourceRect = CRect(0, offsetY, imgWidth, offsetY + newHeight);
+		}
+
+		m_backgroundImage.StretchBlt(dc.m_hDC, rectClient, sourceRect, SRCCOPY);
+	}
 }
 
 void CGXMusicDlg::SetBackgroundAndTransparency(BYTE alpha)
@@ -274,53 +304,6 @@ void CGXMusicDlg::OnGetMinMaxInfo(MINMAXINFO* lpMMI)
 
 BOOL CGXMusicDlg::OnEraseBkgnd(CDC* pDC)
 {
-	// 获取当前对话框的客户区大小
-	CRect rectClient;
-	GetClientRect(&rectClient);
-
-	if (m_backgroundImage)
-	{
-		// 获取图片的尺寸
-		int imgWidth = m_backgroundImage.GetWidth();
-		int imgHeight = m_backgroundImage.GetHeight();
-
-		// 计算客户区和图片的比例
-		double clientRatio = static_cast<double>(rectClient.Width()) / rectClient.Height();
-		double imgRatio = static_cast<double>(imgWidth) / imgHeight;
-
-		// 定义裁剪源矩形区域，保持与最大化窗口一致的比例
-		CRect srcRect;
-		if (clientRatio > imgRatio)
-		{
-			srcRect.right = imgWidth;
-			srcRect.bottom = static_cast<int>(imgWidth / clientRatio);
-			srcRect.left = 0;
-			srcRect.top = 0;
-		}
-		else
-		{
-			srcRect.bottom = imgHeight;
-			srcRect.right = static_cast<int>(imgHeight * clientRatio);
-			srcRect.top = 0;
-			srcRect.left = 0;
-		}
-
-		// 使用 StretchBlt 将裁剪后的图片缩放并绘制到屏幕 DC
-		CDC memDC;
-		memDC.CreateCompatibleDC(pDC);
-		CBitmap bitmap;
-		bitmap.CreateCompatibleBitmap(pDC, srcRect.right, srcRect.bottom);
-		CBitmap* pOldBitmap = memDC.SelectObject(&bitmap);
-
-		m_backgroundImage.Draw(memDC.m_hDC, 0, 0);
-
-		pDC->StretchBlt(rectClient.left, rectClient.top, rectClient.Width(), rectClient.Height(),
-			&memDC, srcRect.left, srcRect.top, srcRect.Width(), srcRect.Height(), SRCCOPY);
-
-		memDC.SelectObject(pOldBitmap);
-	}
-
-	
 	return TRUE;
 }
 
