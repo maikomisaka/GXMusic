@@ -56,6 +56,7 @@ CGXMusicDlg::CGXMusicDlg(CWnd* pParent /*=nullptr*/)
 	m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
 
 	m_bIsWindowMaximized = FALSE;
+	m_hHandCursor = AfxGetApp()->LoadStandardCursor(IDC_HAND);
 }
 
 void CGXMusicDlg::DoDataExchange(CDataExchange* pDX)
@@ -77,6 +78,7 @@ BEGIN_MESSAGE_MAP(CGXMusicDlg, CDialogEx)
 	ON_BN_CLICKED(IDC_GX_MAIN_MIN, OnMainButtonClicked)
 	ON_WM_GETMINMAXINFO()
 	ON_WM_ERASEBKGND()
+	ON_WM_SETCURSOR()
 END_MESSAGE_MAP()
 
 
@@ -256,4 +258,20 @@ void CGXMusicDlg::OnGetMinMaxInfo(MINMAXINFO* lpMMI)
 BOOL CGXMusicDlg::OnEraseBkgnd(CDC* pDC)
 {
 	return TRUE;
+}
+
+BOOL CGXMusicDlg::OnSetCursor(CWnd* pWnd, UINT nHitTest, UINT message)
+{
+	// 检查是否在按钮上
+	if (pWnd == GetDlgItem(IDC_GX_MAIN_CLOSE) ||
+		pWnd == GetDlgItem(IDC_GX_MAIN_MAX) || 
+		pWnd == GetDlgItem(IDC_GX_MAIN_MIN) )
+	{
+		// 设置手形光标
+		::SetCursor(m_hHandCursor);
+		return TRUE;
+	}
+
+	// 使用默认光标
+	return CDialogEx::OnSetCursor(pWnd, nHitTest, message);
 }

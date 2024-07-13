@@ -26,6 +26,7 @@ private:
 	CTransparentButton m_MaximizeButton;
 	CTransparentButton m_MinimizeButton;
 	BOOL			   m_bIsWindowMaximized;	// for maximize window
+	HCURSOR m_hHandCursor;  // 手形光标
 
 	void SetBackgroundAndTransparency(BYTE alpha);
 
@@ -45,5 +46,6 @@ protected:
 	afx_msg void OnMainButtonClicked();
 	afx_msg void OnGetMinMaxInfo(MINMAXINFO* lpMMI);
 	afx_msg BOOL OnEraseBkgnd(CDC* pDC);
+	afx_msg BOOL OnSetCursor(CWnd* pWnd, UINT nHitTest, UINT message);
 	DECLARE_MESSAGE_MAP()
 };
