@@ -2,6 +2,7 @@
 // GXMusicDlg.h: 头文件
 //
 #include "TransparentButton.h"
+#include "TransparentImage.h"
 
 #pragma once
 
@@ -27,6 +28,7 @@ private:
 	CTransparentButton m_MinimizeButton;
 	BOOL			   m_bIsWindowMaximized;	// for maximize window
 	HCURSOR m_hHandCursor;  // 手形光标
+	TransparentImage m_imageIcon;
 
 	void SetBackgroundAndTransparency(BYTE alpha);
 

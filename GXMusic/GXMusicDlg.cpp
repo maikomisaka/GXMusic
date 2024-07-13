@@ -123,6 +123,9 @@ BOOL CGXMusicDlg::OnInitDialog()
 	m_MinimizeButton.SetNormalImage(IDB_GX_MAIN_MIN);
 	m_MinimizeButton.SetHoverImage(IDB_GX_MAIN_MIN_HOVER);
 
+	m_imageIcon.SubclassDlgItem(IDC_GX_MAIN_ICON, this);
+	m_imageIcon.SetImage(_T(".\\res\\GX_Music_Icon.png"));
+
 	return TRUE;  // 除非将焦点设置到控件，否则返回 TRUE
 }
 
