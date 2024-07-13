@@ -20,10 +20,12 @@ public:
 
 
 private:
+	// for UI degign
 	CImage m_bgImage; // 用于加载背景图片
 	CTransparentButton m_CloseButton;
 	CTransparentButton m_MaximizeButton;
 	CTransparentButton m_MinimizeButton;
+	BOOL			   m_bIsWindowMaximized;	// for maximize window
 
 	void SetBackgroundAndTransparency(BYTE alpha);
 
@@ -40,6 +42,6 @@ protected:
 	afx_msg void OnPaint();
 	afx_msg HCURSOR OnQueryDragIcon();
 	afx_msg LRESULT OnNcHitTest(CPoint point);
-	afx_msg void OnCloseButtonClicked();
+	afx_msg void OnMainButtonClicked();
 	DECLARE_MESSAGE_MAP()
 };

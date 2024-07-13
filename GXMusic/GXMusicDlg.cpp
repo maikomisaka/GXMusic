@@ -54,6 +54,8 @@ CGXMusicDlg::CGXMusicDlg(CWnd* pParent /*=nullptr*/)
 	: CDialogEx(IDD_GXMUSIC_DIALOG, pParent)
 {
 	m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
+
+	m_bIsWindowMaximized = FALSE;
 }
 
 void CGXMusicDlg::DoDataExchange(CDataExchange* pDX)
@@ -70,7 +72,9 @@ BEGIN_MESSAGE_MAP(CGXMusicDlg, CDialogEx)
 	ON_WM_QUERYDRAGICON()
 	ON_WM_NCHITTEST()
 	ON_WM_CTLCOLOR()
-	ON_BN_CLICKED(IDC_GX_MAIN_CLOSE, OnCloseButtonClicked)	
+	ON_BN_CLICKED(IDC_GX_MAIN_CLOSE, OnMainButtonClicked)	
+	ON_BN_CLICKED(IDC_GX_MAIN_MAX, OnMainButtonClicked)
+	ON_BN_CLICKED(IDC_GX_MAIN_MIN, OnMainButtonClicked)
 END_MESSAGE_MAP()
 
 
@@ -131,12 +135,6 @@ void CGXMusicDlg::OnSysCommand(UINT nID, LPARAM lParam)
 	}
 }
 
-// 如果向对话框添加最小化按钮，则需要下面的代码
-//  来绘制该图标。  对于使用文档/视图模型的 MFC 应用程序，
-//  这将由框架自动完成。
-
-//当用户拖动最小化窗口时系统调用此函数取得光标
-//显示。
 HCURSOR CGXMusicDlg::OnQueryDragIcon()
 {
 	return static_cast<HCURSOR>(m_hIcon);
@@ -168,7 +166,6 @@ void CGXMusicDlg::OnPaint()
 		
 	}
 }
-
 
 void CGXMusicDlg::SetBackgroundAndTransparency(BYTE alpha)
 {
@@ -216,7 +213,25 @@ LRESULT CGXMusicDlg::OnNcHitTest(CPoint point) {
 	return CDialogEx::OnNcHitTest(point);
 }
 
-void CGXMusicDlg::OnCloseButtonClicked()
+void CGXMusicDlg::OnMainButtonClicked()
 {
-	EndDialog(IDCANCEL);
+	CWnd* pWnd = GetFocus();
+	UINT nID = pWnd->GetDlgCtrlID();
+	if (nID == IDC_GX_MAIN_CLOSE) {
+		EndDialog(IDCANCEL);
+	}
+	else if (nID == IDC_GX_MAIN_MAX) {
+		if (m_bIsWindowMaximized) {
+			ShowWindow(SW_RESTORE);
+			m_bIsWindowMaximized = FALSE;
+		}
+		else {
+			ShowWindow(SW_MAXIMIZE);
+			m_bIsWindowMaximized = TRUE;
+		}
+		
+	}
+	else if (nID == IDC_GX_MAIN_MIN) {
+		ShowWindow(SW_MINIMIZE);
+	}
 }
