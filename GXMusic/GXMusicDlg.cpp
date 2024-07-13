@@ -79,6 +79,7 @@ BEGIN_MESSAGE_MAP(CGXMusicDlg, CDialogEx)
 	ON_WM_GETMINMAXINFO()
 	ON_WM_ERASEBKGND()
 	ON_WM_SETCURSOR()
+	ON_WM_SIZE()
 END_MESSAGE_MAP()
 
 
@@ -115,6 +116,11 @@ BOOL CGXMusicDlg::OnInitDialog()
 
 	// Background setting
 	m_bgImage.Load(_T(".\\res\\GX_App_Background.png"));
+	// 设置窗口区域为圆角
+	CRect rect;
+	GetWindowRect(&rect);
+	SetWindowRgn(CreateRoundRectRgn(0, 0, rect.Width(), rect.Height(), 20, 20), TRUE);
+
 
 	m_CloseButton.SetNormalImage(IDB_GX_MAIN_CLOSE);
 	m_CloseButton.SetHoverImage(IDB_GX_MAIN_CLOSE_HOVER);
@@ -126,6 +132,7 @@ BOOL CGXMusicDlg::OnInitDialog()
 	m_imageIcon.SubclassDlgItem(IDC_GX_MAIN_ICON, this);
 	m_imageIcon.SetImage(_T(".\\res\\GX_Music_Icon.png"));
 	m_staticTitle.SubclassDlgItem(IDC_GX_MAIN_TITLE, this);
+
 	// Transparent Block Setting
 	m_blockMain.SubclassDlgItem(IDC_GX_MAIN_BLOCK, this);
 
@@ -152,29 +159,8 @@ HCURSOR CGXMusicDlg::OnQueryDragIcon()
 
 void CGXMusicDlg::OnPaint()
 {
-	if (IsIconic())
-	{
-		CPaintDC dc(this); // device context for painting
-
-		SendMessage(WM_ICONERASEBKGND, reinterpret_cast<WPARAM>(dc.GetSafeHdc()), 0);
-
-		// Center icon in client rectangle
-		int cxIcon = GetSystemMetrics(SM_CXICON);
-		int cyIcon = GetSystemMetrics(SM_CYICON);
-		CRect rect;
-		GetClientRect(&rect);
-		int x = (rect.Width() - cxIcon + 1) / 2;
-		int y = (rect.Height() - cyIcon + 1) / 2;
-
-		// Draw the icon
-		dc.DrawIcon(x, y, m_hIcon);
-	}
-	else
-	{
-		BYTE alpha = 255;	// 0-255
-		SetBackgroundAndTransparency(alpha);
-		
-	}
+	BYTE alpha = 255;	// 0-255
+	SetBackgroundAndTransparency(alpha);
 }
 
 void CGXMusicDlg::SetBackgroundAndTransparency(BYTE alpha)
@@ -280,4 +266,16 @@ BOOL CGXMusicDlg::OnSetCursor(CWnd* pWnd, UINT nHitTest, UINT message)
 
 	// 使用默认光标
 	return CDialogEx::OnSetCursor(pWnd, nHitTest, message);
+}
+
+void CGXMusicDlg::OnSize(UINT nType, int cx, int cy)
+{
+	CDialogEx::OnSize(nType, cx, cy);
+
+	if (nType != SIZE_MINIMIZED)
+	{
+		// 更新窗口区域为圆角
+		SetWindowRgn(CreateRoundRectRgn(0, 0, cx, cy, 20, 20), TRUE);
+		Invalidate();
+	}
 }
