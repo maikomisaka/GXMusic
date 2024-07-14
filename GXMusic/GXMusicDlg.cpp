@@ -68,6 +68,7 @@ void CGXMusicDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_GX_MAIN_ICON, m_imageIcon);
 	DDX_Control(pDX, IDC_GX_MAIN_TITLE, m_staticTitle);
 	DDX_Control(pDX, IDC_GX_MAIN_BLOCK, m_blockMain);
+	DDX_Control(pDX, IDC_GX_SONG_LIST, m_SongInfoListCtrl);
 }
 
 BEGIN_MESSAGE_MAP(CGXMusicDlg, CDialogEx)
@@ -149,7 +150,6 @@ BOOL CGXMusicDlg::OnInitDialog()
 	GetWindowRect(&rect);
 	SetWindowRgn(CreateRoundRectRgn(0, 0, rect.Width(), rect.Height(), 20, 20), TRUE);
 
-
 	m_CloseButton.SetNormalImage(IDB_GX_MAIN_CLOSE);
 	m_CloseButton.SetHoverImage(IDB_GX_MAIN_CLOSE_HOVER);
 	m_MaximizeButton.SetNormalImage(IDB_GX_MAIN_MAX);
@@ -158,6 +158,8 @@ BOOL CGXMusicDlg::OnInitDialog()
 	m_MinimizeButton.SetHoverImage(IDB_GX_MAIN_MIN_HOVER);
 
 	m_imageIcon.SetImage(_T(".\\res\\GX_Music_Icon.png"));
+
+	InitSongList();
 
 	return TRUE;  // 除非将焦点设置到控件，否则返回 TRUE
 }
@@ -182,8 +184,8 @@ HCURSOR CGXMusicDlg::OnQueryDragIcon()
 
 void CGXMusicDlg::OnPaint()
 {
-	//BYTE alpha = 255;	// 0-255
-	//SetBackgroundAndTransparency(alpha);
+	BYTE alpha = 255;	// 0-255
+	SetBackgroundAndTransparency(alpha);
 	CRect rectClient;
 	GetClientRect(&rectClient);
 
@@ -247,6 +249,32 @@ void CGXMusicDlg::SetBackgroundAndTransparency(BYTE alpha)
 	dc.AlphaBlend(0, 0, rect.Width(), rect.Height(), &memDC, 0, 0, rect.Width(), rect.Height(), bf);
 
 	memDC.SelectObject(pOldBmp);
+}
+
+void CGXMusicDlg::InitSongList()
+{
+	CFont font;
+	font.CreatePointFont(90, _T("Arial"));
+	m_SongInfoListCtrl.SetFont(&font);
+	m_SongInfoListCtrl.SetExtendedStyle(LVS_EX_FULLROWSELECT | LVS_EX_GRIDLINES);
+	m_SongInfoListCtrl.InsertColumn(0, _T("歌曲名"), LVCFMT_LEFT, 100);
+	m_SongInfoListCtrl.InsertColumn(1, _T("歌手"), LVCFMT_LEFT, 100);
+	m_SongInfoListCtrl.InsertColumn(2, _T("专辑"), LVCFMT_LEFT, 100);
+	m_SongInfoListCtrl.InsertColumn(3, _T("时长"), LVCFMT_LEFT, 100);
+
+	GXSongInfo song1 = { _T("歌曲1"), _T("歌手1"), _T("专辑1"), _T("3:30") };
+	GXSongInfo song2 = { _T("歌曲2"), _T("歌手2"), _T("专辑2"), _T("4:05") };
+
+	m_SongInfoList.push_back(song1);
+	m_SongInfoList.push_back(song2);
+
+	for (const auto& song : m_SongInfoList)
+	{
+		int nItem = m_SongInfoListCtrl.InsertItem(m_SongInfoListCtrl.GetItemCount(), song.m_title);
+		m_SongInfoListCtrl.SetItemText(nItem, 1, song.m_artist);
+		m_SongInfoListCtrl.SetItemText(nItem, 2, song.m_album);
+		m_SongInfoListCtrl.SetItemText(nItem, 3, song.m_duration);
+	}
 }
 
 LRESULT CGXMusicDlg::OnNcHitTest(CPoint point) {

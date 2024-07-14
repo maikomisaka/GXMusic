@@ -9,6 +9,14 @@
 
 #include <vector>
 
+struct GXSongInfo {
+	CString m_title;
+	//CString m_filePath;
+	CString m_artist;
+	CString m_album;
+	CString m_duration;
+};
+
 // CGXMusicDlg 对话框
 class CGXMusicDlg : public CDialogEx
 {
@@ -39,7 +47,11 @@ private:
 	std::vector<int> m_vecScaleControlIDs;
 	CRect m_initialDialogRect;
 
+	std::vector<GXSongInfo> m_SongInfoList;
+	CListCtrl m_SongInfoListCtrl;
+
 	void SetBackgroundAndTransparency(BYTE alpha);
+	void InitSongList();
 
 protected:
 	virtual void DoDataExchange(CDataExchange* pDX);	// DDX/DDV 支持
