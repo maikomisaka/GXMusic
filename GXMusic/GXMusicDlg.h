@@ -6,6 +6,7 @@
 #include "TransparentImage.h"
 #include "TransparentStatic.h"
 #include "CTransparentColorBlock.h"
+#include "TransparentList.h"
 
 #include <vector>
 
@@ -48,7 +49,7 @@ private:
 	CRect m_initialDialogRect;
 
 	std::vector<GXSongInfo> m_SongInfoList;
-	CListCtrl m_SongInfoListCtrl;
+	/*CListCtrl*/TransparentList m_SongInfoListCtrl;
 
 	void SetBackgroundAndTransparency(BYTE alpha);
 	void InitSongList();
@@ -71,5 +72,7 @@ protected:
 	afx_msg BOOL OnEraseBkgnd(CDC* pDC);
 	afx_msg BOOL OnSetCursor(CWnd* pWnd, UINT nHitTest, UINT message);
 	afx_msg void OnSize(UINT nType, int cx, int cy);
+	afx_msg void OnCustomDrawHeader(NMHDR* pNMHDR, LRESULT* pResult);
+	virtual HBRUSH OnCtlColor(CDC* pDC, CWnd* pWnd, UINT nCtlColor);
 	DECLARE_MESSAGE_MAP()
 };

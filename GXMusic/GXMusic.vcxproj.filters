@@ -45,6 +45,9 @@
     <ClInclude Include="CTransparentColorBlock.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="TransparentList.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="GXMusic.cpp">
@@ -68,6 +71,9 @@
     <ClCompile Include="CTransparentColorBlock.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="TransparentList.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="GXMusic.rc">
@@ -81,9 +87,6 @@
   </ItemGroup>
   <ItemGroup>
     <Image Include="res\GXMusic.ico">
-      <Filter>资源文件</Filter>
-    </Image>
-    <Image Include="res\GX_App_Background.bmp">
       <Filter>资源文件</Filter>
     </Image>
     <Image Include="res\GX_App_Close.png">

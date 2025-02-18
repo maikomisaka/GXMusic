@@ -193,6 +193,7 @@
     <ClInclude Include="targetver.h" />
     <ClInclude Include="TransparentButton.h" />
     <ClInclude Include="TransparentImage.h" />
+    <ClInclude Include="TransparentList.h" />
     <ClInclude Include="TransparentStatic.h" />
   </ItemGroup>
   <ItemGroup>
@@ -207,6 +208,7 @@
     </ClCompile>
     <ClCompile Include="TransparentButton.cpp" />
     <ClCompile Include="TransparentImage.cpp" />
+    <ClCompile Include="TransparentList.cpp" />
     <ClCompile Include="TransparentStatic.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -217,7 +219,6 @@
   </ItemGroup>
   <ItemGroup>
     <Image Include="res\GXMusic.ico" />
-    <Image Include="res\GX_App_Background.bmp" />
     <Image Include="res\GX_App_Close.png" />
     <Image Include="res\GX_App_Close_Hover.png" />
     <Image Include="res\GX_App_Maximize.png" />

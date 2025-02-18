@@ -253,10 +253,14 @@ void CGXMusicDlg::SetBackgroundAndTransparency(BYTE alpha)
 
 void CGXMusicDlg::InitSongList()
 {
+	m_SongInfoListCtrl.SetExtendedStyle(m_SongInfoListCtrl.GetExtendedStyle() | LVS_EX_TRANSPARENTBKGND);
+	m_SongInfoListCtrl.SetBkColor(CLR_NONE);
+
 	CFont font;
 	font.CreatePointFont(90, _T("Arial"));
 	m_SongInfoListCtrl.SetFont(&font);
-	m_SongInfoListCtrl.SetExtendedStyle(LVS_EX_FULLROWSELECT | LVS_EX_GRIDLINES);
+	m_SongInfoListCtrl.SetView(LV_VIEW_DETAILS);
+	m_SongInfoListCtrl.SetExtendedStyle(LVS_EX_FULLROWSELECT);
 	m_SongInfoListCtrl.InsertColumn(0, _T("歌曲名"), LVCFMT_LEFT, 100);
 	m_SongInfoListCtrl.InsertColumn(1, _T("歌手"), LVCFMT_LEFT, 100);
 	m_SongInfoListCtrl.InsertColumn(2, _T("专辑"), LVCFMT_LEFT, 100);
@@ -332,6 +336,29 @@ void CGXMusicDlg::OnGetMinMaxInfo(MINMAXINFO* lpMMI)
 
 BOOL CGXMusicDlg::OnEraseBkgnd(CDC* pDC)
 {
+	CRect rect;
+	GetClientRect(rect);
+
+	// 使用 AlphaBlend 绘制透明 PNG
+	BLENDFUNCTION blend = { 0 };
+	blend.BlendOp = AC_SRC_OVER;
+	blend.SourceConstantAlpha = 255;  // 不透明度
+	blend.AlphaFormat = AC_SRC_ALPHA; // 启用 Alpha 通道
+
+	CDC memDC;
+	memDC.CreateCompatibleDC(pDC);
+	HBITMAP hOldBmp = (HBITMAP)memDC.SelectObject(CBitmap::FromHandle(m_backgroundImage));
+
+	pDC->AlphaBlend(
+		0, 0, rect.Width(), rect.Height(),
+		&memDC,
+		0, 0, m_backgroundImage.GetWidth(), m_backgroundImage.GetHeight(),
+		blend
+	);
+
+	memDC.SelectObject(hOldBmp);
+
+
 	return TRUE;
 }
 
@@ -396,4 +423,15 @@ void CGXMusicDlg::OnSize(UINT nType, int cx, int cy)
 
 		Invalidate();
 	}
+}
+
+void CGXMusicDlg::OnCustomDrawHeader(NMHDR* pNMHDR, LRESULT* pResult)
+{
+}
+
+HBRUSH CGXMusicDlg::OnCtlColor(CDC* pDC, CWnd* pWnd, UINT nCtlColor)
+{
+	HBRUSH hbr = CDialogEx::OnCtlColor(pDC, pWnd, nCtlColor);
+
+	return hbr;
 }
