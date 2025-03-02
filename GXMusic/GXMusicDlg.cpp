@@ -253,18 +253,23 @@ void CGXMusicDlg::SetBackgroundAndTransparency(BYTE alpha)
 
 void CGXMusicDlg::InitSongList()
 {
-	m_SongInfoListCtrl.SetExtendedStyle(m_SongInfoListCtrl.GetExtendedStyle() | LVS_EX_TRANSPARENTBKGND);
-	m_SongInfoListCtrl.SetBkColor(CLR_NONE);
-
 	CFont font;
-	font.CreatePointFont(90, _T("Arial"));
+	CRect listRect;
+
+	font.CreatePointFont(250, _T("Arial"));
+
+	m_SongInfoListCtrl.SetExtendedStyle(m_SongInfoListCtrl.GetExtendedStyle() | LVS_EX_TRANSPARENTBKGND);
+	
 	m_SongInfoListCtrl.SetFont(&font);
 	m_SongInfoListCtrl.SetView(LV_VIEW_DETAILS);
 	m_SongInfoListCtrl.SetExtendedStyle(LVS_EX_FULLROWSELECT);
-	m_SongInfoListCtrl.InsertColumn(0, _T("歌曲名"), LVCFMT_LEFT, 100);
-	m_SongInfoListCtrl.InsertColumn(1, _T("歌手"), LVCFMT_LEFT, 100);
-	m_SongInfoListCtrl.InsertColumn(2, _T("专辑"), LVCFMT_LEFT, 100);
-	m_SongInfoListCtrl.InsertColumn(3, _T("时长"), LVCFMT_LEFT, 100);
+
+	m_SongInfoListCtrl.GetClientRect(&listRect);
+
+	m_SongInfoListCtrl.InsertColumn(0, _T("歌曲名"), LVCFMT_LEFT, listRect.Width() * 0.3);
+	m_SongInfoListCtrl.InsertColumn(1, _T("歌手"), LVCFMT_LEFT, listRect.Width() * 0.3);
+	m_SongInfoListCtrl.InsertColumn(2, _T("专辑"), LVCFMT_LEFT, listRect.Width() * 0.2);
+	m_SongInfoListCtrl.InsertColumn(3, _T("时长"), LVCFMT_LEFT, listRect.Width() * 0.2);
 
 	GXSongInfo song1 = { _T("歌曲1"), _T("歌手1"), _T("专辑1"), _T("3:30") };
 	GXSongInfo song2 = { _T("歌曲2"), _T("歌手2"), _T("专辑2"), _T("4:05") };
@@ -279,6 +284,13 @@ void CGXMusicDlg::InitSongList()
 		m_SongInfoListCtrl.SetItemText(nItem, 2, song.m_album);
 		m_SongInfoListCtrl.SetItemText(nItem, 3, song.m_duration);
 	}
+
+
+	//加载自定义Header
+	CHeaderCtrl* pHeader = m_SongInfoListCtrl.GetHeaderCtrl();
+
+	m_listHeaderCtrl.SubclassWindow(pHeader->m_hWnd);
+	
 }
 
 LRESULT CGXMusicDlg::OnNcHitTest(CPoint point) {
@@ -423,10 +435,6 @@ void CGXMusicDlg::OnSize(UINT nType, int cx, int cy)
 
 		Invalidate();
 	}
-}
-
-void CGXMusicDlg::OnCustomDrawHeader(NMHDR* pNMHDR, LRESULT* pResult)
-{
 }
 
 HBRUSH CGXMusicDlg::OnCtlColor(CDC* pDC, CWnd* pWnd, UINT nCtlColor)

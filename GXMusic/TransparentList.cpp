@@ -11,7 +11,7 @@ END_MESSAGE_MAP()
 
 BOOL TransparentList::OnEraseBkgnd(CDC* pDC)
 {
-	return TRUE; // 阻止默认背景擦除
+	return TRUE;
 }
 
 void TransparentList::OnNMCustomDraw(NMHDR* pNMHDR, LRESULT* pResult)
@@ -26,9 +26,11 @@ void TransparentList::OnNMCustomDraw(NMHDR* pNMHDR, LRESULT* pResult)
         break;
 
     case CDDS_ITEMPREPAINT:
-        pLVCD->nmcd.uItemState &= ~CDIS_SELECTED; // 可选：取消选中状态的高亮
-        pLVCD->clrText = RGB(255, 255, 255);      // 设置文本颜色
-        pLVCD->clrTextBk = CLR_NONE;              // 设置透明背景
+        // 设置透明背景和文本颜色
+        pLVCD->clrText = RGB(255, 255, 255); // 白色文本
+        pLVCD->clrTextBk = CLR_NONE;         // 透明背景
+
+        // 不跳过默认绘制！允许系统绘制文本
         *pResult = CDRF_NEWFONT;
         break;
     }
@@ -37,52 +39,60 @@ void TransparentList::OnNMCustomDraw(NMHDR* pNMHDR, LRESULT* pResult)
 void TransparentList::OnPaint()
 {
     CPaintDC dc(this);
+    CRect rcClient;
+    GetClientRect(rcClient);
 
-    // 使用内存DC防止闪烁
+    // 双缓冲绘制
     CDC memDC;
     memDC.CreateCompatibleDC(&dc);
     CBitmap memBitmap;
-    CRect rcClient;
-    GetClientRect(rcClient);
     memBitmap.CreateCompatibleBitmap(&dc, rcClient.Width(), rcClient.Height());
     CBitmap* pOldBmp = memDC.SelectObject(&memBitmap);
 
-    // 绘制父窗口背景
-    DrawParentBackground(&memDC);
+    // 1. 绘制父窗口背景（覆盖整个区域）
+    DrawParentBackground(&memDC, rcClient);
 
-    // 绘制列表内容
+    // 2. 绘制列表内容（排除标题行区域）
     DefWindowProc(WM_PAINT, (WPARAM)memDC.GetSafeHdc(), 0);
 
-    // 复制到屏幕
+    // 3. 复制到屏幕
     dc.BitBlt(0, 0, rcClient.Width(), rcClient.Height(), &memDC, 0, 0, SRCCOPY);
     memDC.SelectObject(pOldBmp);
+    //CListCtrl::OnPaint();
 }
 
-void TransparentList::DrawParentBackground(CDC* pDC)
+void TransparentList::PreSubclassWindow()
+{
+    CListCtrl::PreSubclassWindow();
+    ModifyStyle(0, WS_CLIPCHILDREN);
+}
+
+void TransparentList::DrawParentBackground(CDC* pDC, CRect rcArea)
 {
     CWnd* pParent = GetParent();
     if (!pParent || !pDC) return;
 
-    // 获取列表控件在父窗口中的位置
-    CRect rcList;
-    GetWindowRect(rcList);
-    pParent->ScreenToClient(rcList); // 转换为父窗口坐标系
-
-    // 保存原始设备上下文状态
+    // 保存设备上下文状态
     int nSaveDC = pDC->SaveDC();
 
-    // 设置裁剪区域防止绘制到控件外
-    CRect rcClient;
-    GetClientRect(rcClient);
-    pDC->IntersectClipRect(rcClient);
+    // 设置裁剪区域
+    pDC->IntersectClipRect(rcArea);
 
-    // 偏移设备上下文原点至控件位置
-    pDC->SetWindowOrg(rcList.left, rcList.top);
+    // 计算控件在父窗口中的实际位置
+    CRect rcList;
+    GetWindowRect(rcList);
+    pParent->ScreenToClient(rcList);
 
-    // 强制父窗口绘制背景到此DC
+    // 偏移原点
+    pDC->SetWindowOrg(
+        rcList.left - rcArea.left,
+        rcList.top - rcArea.top
+    );
+
+    // 强制父窗口绘制背景
     pParent->SendMessage(WM_ERASEBKGND, (WPARAM)pDC->GetSafeHdc());
-    pParent->SendMessage(WM_PRINTCLIENT, (WPARAM)pDC->GetSafeHdc(),
-        PRF_CLIENT | PRF_CHILDREN | PRF_ERASEBKGND);
+    //pParent->SendMessage(WM_PRINTCLIENT, (WPARAM)pDC->GetSafeHdc(),
+        //PRF_CLIENT | PRF_ERASEBKGND);
 
     // 恢复设备上下文
     pDC->RestoreDC(nSaveDC);

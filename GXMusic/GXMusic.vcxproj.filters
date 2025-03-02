@@ -48,6 +48,9 @@
     <ClInclude Include="TransparentList.h">
       <Filter>头文件</Filter>
     </ClInclude>
+    <ClInclude Include="CTransparentHeaderCtrl.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="GXMusic.cpp">
@@ -72,6 +75,9 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="TransparentList.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="CTransparentHeaderCtrl.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

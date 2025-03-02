@@ -185,6 +185,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="CTransparentColorBlock.h" />
+    <ClInclude Include="CTransparentHeaderCtrl.h" />
     <ClInclude Include="framework.h" />
     <ClInclude Include="GXMusic.h" />
     <ClInclude Include="GXMusicDlg.h" />
@@ -198,6 +199,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="CTransparentColorBlock.cpp" />
+    <ClCompile Include="CTransparentHeaderCtrl.cpp" />
     <ClCompile Include="GXMusic.cpp" />
     <ClCompile Include="GXMusicDlg.cpp" />
     <ClCompile Include="pch.cpp">

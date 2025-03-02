@@ -6,7 +6,8 @@ class TransparentList : public CListCtrl
 protected:
     DECLARE_MESSAGE_MAP()
 private:
-    void DrawParentBackground(CDC* pDC);
+    virtual void PreSubclassWindow();
+    void DrawParentBackground(CDC* pDC, CRect rcArea);
 public:
     afx_msg BOOL OnEraseBkgnd(CDC* pDC);
     afx_msg void OnPaint();
