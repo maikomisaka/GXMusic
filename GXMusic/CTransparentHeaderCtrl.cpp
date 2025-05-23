@@ -6,7 +6,8 @@ IMPLEMENT_DYNAMIC(CTransparentHeaderCtrl, CHeaderCtrl)
 BEGIN_MESSAGE_MAP(CTransparentHeaderCtrl, CHeaderCtrl)
     ON_WM_ERASEBKGND()
     ON_WM_PAINT()
-    ON_NOTIFY_REFLECT(NM_CUSTOMDRAW, OnNMCustomDraw)
+    ON_NOTIFY_REFLECT(HDN_BEGINTRACK, OnHeaderBeginTrack)
+    ON_WM_SETCURSOR()
 END_MESSAGE_MAP()
 
 CTransparentHeaderCtrl::CTransparentHeaderCtrl() {}
@@ -19,33 +20,18 @@ BOOL CTransparentHeaderCtrl::OnEraseBkgnd(CDC* pDC)
 
 void CTransparentHeaderCtrl::OnPaint()
 {
-    //CHeaderCtrl::OnPaint();
     CPaintDC dc(this);
-    CRect rect;
-    GetClientRect(&rect);
-
-    // 创建GDI+ Graphics对象
     Gdiplus::Graphics graphics(dc.m_hDC);
-    Gdiplus::Bitmap buffer(rect.Width(), rect.Height());
-    Gdiplus::Graphics bufferGraphics(&buffer);
 
-    // 绘制父窗口背景到缓冲区
-    CWnd* pParent = GetParent();
-    if (pParent)
-    {
-        CPoint pt(0, 0);
-        MapWindowPoints(pParent, &pt, 1);
+    // 绘制标题文字
+    DrawHeaderText(graphics);
+}
 
-        HDC hdcBuffer = bufferGraphics.GetHDC();
-        CDC* pDC = CDC::FromHandle(hdcBuffer);
-        pDC->SetWindowOrg(-pt.x, -pt.y);
-        pParent->SendMessage(WM_ERASEBKGND, (WPARAM)hdcBuffer);
-        bufferGraphics.ReleaseHDC(hdcBuffer);
-    }
-
+void CTransparentHeaderCtrl::DrawHeaderText(Gdiplus::Graphics& graphics)
+{
     // 绘制透明文本（带抗锯齿）
-    Gdiplus::Font font(L"Arial", 16, Gdiplus::FontStyleBold, Gdiplus::UnitPixel);
-    Gdiplus::SolidBrush textBrush(Gdiplus::Color(255, 255, 255)); // 黑色文本
+    Gdiplus::Font font(L"Arial", 18, Gdiplus::FontStyleBold, Gdiplus::UnitPixel);
+    Gdiplus::SolidBrush textBrush(Gdiplus::Color(255, 255, 255));
 
     int nItems = GetItemCount();
     for (int i = 0; i < nItems; ++i)
@@ -68,38 +54,25 @@ void CTransparentHeaderCtrl::OnPaint()
         );
 
         // 绘制文本
-        bufferGraphics.SetTextRenderingHint(Gdiplus::TextRenderingHintAntiAlias);
+        graphics.SetTextRenderingHint(Gdiplus::TextRenderingHintAntiAlias);
         // 创建对齐格式（垂直居中）
         Gdiplus::StringFormat format;
         format.SetLineAlignment(Gdiplus::StringAlignmentCenter); // 垂直居中
 
-        bufferGraphics.DrawString(
+        graphics.DrawString(
             CStringW(szText), -1, &font, gdiRect,
             &format, &textBrush
         );
     }
-
-    // 输出到屏幕
-    graphics.DrawImage(&buffer, 0, 0);
 }
 
-void CTransparentHeaderCtrl::OnNMCustomDraw(NMHDR* pNMHDR, LRESULT* pResult)
+void CTransparentHeaderCtrl::OnHeaderBeginTrack(NMHDR* pNMHDR, LRESULT* pResult)
 {
-    NMLVCUSTOMDRAW* pNMCD = reinterpret_cast<NMLVCUSTOMDRAW*>(pNMHDR);
-    *pResult = CDRF_DODEFAULT;
+    *pResult = 1; // 设置 pResult 为 1 阻止调整
+}
 
-    //switch (pNMCD->nmcd.dwDrawStage)
-    //{
-    //case CDDS_PREPAINT:
-    //    *pResult = CDRF_NOTIFYITEMDRAW;
-    //    break;
-
-    //case CDDS_ITEMPREPAINT:
-    //    //pNMCD->clrText = RGB(255, 255, 255); // 白色文本
-    //    pNMCD->clrTextBk = CLR_NONE;         // 透明背景
-    //    ::SetBkMode(pNMCD->nmcd.hdc, TRANSPARENT);
-    //    *pResult = CDRF_NEWFONT;
-    //    break;
-    //}
-
+BOOL CTransparentHeaderCtrl::OnSetCursor(CWnd* pWnd, UINT nHitTest, UINT message)
+{
+    ::SetCursor(::LoadCursor(NULL, IDC_ARROW));
+    return TRUE;
 }

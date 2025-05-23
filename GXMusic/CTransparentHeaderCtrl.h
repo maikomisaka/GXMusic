@@ -15,6 +15,10 @@ protected:
 public:
     afx_msg BOOL OnEraseBkgnd(CDC* pDC);
     afx_msg void OnPaint();
-    afx_msg void OnNMCustomDraw(NMHDR* pNMHDR, LRESULT* pResult);
+    afx_msg void OnHeaderBeginTrack(NMHDR* pNMHDR, LRESULT* pResult);
+    afx_msg BOOL OnSetCursor(CWnd* pWnd, UINT nHitTest, UINT message);
+
+private:
+    void DrawHeaderText(Gdiplus::Graphics& graphics);           // ÎÄ×Ö»æÖÆ
 };
 

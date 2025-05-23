@@ -9,7 +9,16 @@
 #include "TransparentList.h"
 #include "CTransparentHeaderCtrl.h"
 
-#include <vector>
+
+#include <iostream>
+//#include <codecvt>
+#include <mmsystem.h>
+
+#include <taglib/fileref.h>
+#include <taglib/tag.h>
+#include <taglib/id3v2tag.h>
+
+#pragma comment(lib, "winmm.lib")
 
 struct GXSongInfo {
 	CString m_title;
@@ -51,7 +60,17 @@ private:
 
 	std::vector<GXSongInfo> m_SongInfoList;
 	TransparentList m_SongInfoListCtrl;
-	CTransparentHeaderCtrl m_listHeaderCtrl;
+
+	CString m_strCurMusicFilePath;
+	bool m_bPause;
+	CString m_strDefaultDirectoryPath;
+	std::vector<CString> m_vecMusicFilePaths;
+
+	void PlayMusic();
+	void PauseOrPlayMusic(bool bPause);
+	void StopMusic();
+	void SetMusicVolume(int nVolume);
+	HRESULT LoadDefaultMusics();
 
 	void SetBackgroundAndTransparency(BYTE alpha);
 	void InitSongList();
@@ -74,6 +93,6 @@ protected:
 	afx_msg BOOL OnEraseBkgnd(CDC* pDC);
 	afx_msg BOOL OnSetCursor(CWnd* pWnd, UINT nHitTest, UINT message);
 	afx_msg void OnSize(UINT nType, int cx, int cy);
-	virtual HBRUSH OnCtlColor(CDC* pDC, CWnd* pWnd, UINT nCtlColor);
+	afx_msg void OnMusicListDoubleClick(NMHDR* pNMHDR, LRESULT* pResult);
 	DECLARE_MESSAGE_MAP()
 };

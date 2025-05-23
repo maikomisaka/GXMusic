@@ -6,7 +6,12 @@ IMPLEMENT_DYNAMIC(TransparentList, CListCtrl)
 BEGIN_MESSAGE_MAP(TransparentList, CListCtrl)
     ON_WM_ERASEBKGND()
     ON_WM_PAINT()
+    ON_WM_VSCROLL()
+    ON_WM_HSCROLL()
+    ON_WM_MOUSEWHEEL()
     ON_NOTIFY_REFLECT(NM_CUSTOMDRAW, OnNMCustomDraw)
+    ON_MESSAGE(WM_PRINTCLIENT, OnPrintClient)
+    ON_WM_NCCALCSIZE()
 END_MESSAGE_MAP()
 
 BOOL TransparentList::OnEraseBkgnd(CDC* pDC)
@@ -38,62 +43,84 @@ void TransparentList::OnNMCustomDraw(NMHDR* pNMHDR, LRESULT* pResult)
 
 void TransparentList::OnPaint()
 {
-    CPaintDC dc(this);
-    CRect rcClient;
-    GetClientRect(rcClient);
-
-    // 双缓冲绘制
-    CDC memDC;
-    memDC.CreateCompatibleDC(&dc);
-    CBitmap memBitmap;
-    memBitmap.CreateCompatibleBitmap(&dc, rcClient.Width(), rcClient.Height());
-    CBitmap* pOldBmp = memDC.SelectObject(&memBitmap);
-
-    // 1. 绘制父窗口背景（覆盖整个区域）
-    DrawParentBackground(&memDC, rcClient);
-
-    // 2. 绘制列表内容（排除标题行区域）
-    DefWindowProc(WM_PAINT, (WPARAM)memDC.GetSafeHdc(), 0);
-
-    // 3. 复制到屏幕
-    dc.BitBlt(0, 0, rcClient.Width(), rcClient.Height(), &memDC, 0, 0, SRCCOPY);
-    memDC.SelectObject(pOldBmp);
-    //CListCtrl::OnPaint();
+    CListCtrl::OnPaint();
 }
 
 void TransparentList::PreSubclassWindow()
 {
     CListCtrl::PreSubclassWindow();
-    ModifyStyle(0, WS_CLIPCHILDREN);
+
+    CHeaderCtrl* pHeader = GetHeaderCtrl();
+    if (pHeader && pHeader->GetSafeHwnd())
+    {
+        m_listHeaderCtrl.SubclassWindow(pHeader->GetSafeHwnd());
+    }
+        
 }
 
-void TransparentList::DrawParentBackground(CDC* pDC, CRect rcArea)
+// 垂直滚动处理
+void TransparentList::OnVScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar)
 {
-    CWnd* pParent = GetParent();
-    if (!pParent || !pDC) return;
+    CRect rcClient;
+    GetClientRect(&rcClient);
 
-    // 保存设备上下文状态
-    int nSaveDC = pDC->SaveDC();
+    // 计算滚动偏移量
+    int scrollOffset = GetScrollPos(SB_VERT) - nPos;
 
-    // 设置裁剪区域
-    pDC->IntersectClipRect(rcArea);
+    SetRedraw(FALSE); // 临时禁止绘制
+    // 调用基类处理滚动逻辑
+    CListCtrl::OnVScroll(nSBCode, nPos, pScrollBar);
 
-    // 计算控件在父窗口中的实际位置
-    CRect rcList;
-    GetWindowRect(rcList);
-    pParent->ScreenToClient(rcList);
+    SetRedraw(TRUE);
 
-    // 偏移原点
-    pDC->SetWindowOrg(
-        rcList.left - rcArea.left,
-        rcList.top - rcArea.top
+    // 仅重绘受影响区域
+    if (scrollOffset != 0) {
+        CRect rcUpdate = rcClient;
+        rcUpdate.top += scrollOffset;
+        InvalidateRect(&rcUpdate, FALSE); // FALSE表示不擦除背景
+        UpdateWindow();
+    }
+}
+
+// 水平滚动处理
+void TransparentList::OnHScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar)
+{
+    SetRedraw(FALSE);
+    CListCtrl::OnHScroll(nSBCode, nPos, pScrollBar);
+    SetRedraw(TRUE);
+    RedrawWindow(
+        NULL,
+        NULL,
+        RDW_INVALIDATE | RDW_UPDATENOW | RDW_ERASE | RDW_ALLCHILDREN
     );
+}
 
-    // 强制父窗口绘制背景
-    pParent->SendMessage(WM_ERASEBKGND, (WPARAM)pDC->GetSafeHdc());
-    //pParent->SendMessage(WM_PRINTCLIENT, (WPARAM)pDC->GetSafeHdc(),
-        //PRF_CLIENT | PRF_ERASEBKGND);
+// 鼠标滚轮处理
+BOOL TransparentList::OnMouseWheel(UINT nFlags, short zDelta, CPoint pt)
+{
+    SetRedraw(FALSE);
+    BOOL bResult = CListCtrl::OnMouseWheel(nFlags, zDelta, pt);
+    SetRedraw(TRUE);
+    RedrawWindow(
+        NULL,
+        NULL,
+        RDW_INVALIDATE | RDW_UPDATENOW | RDW_ERASE
+    );
+    //GetParent()->SendMessage(WM_USER + 100);
+    return bResult;
+}
 
-    // 恢复设备上下文
-    pDC->RestoreDC(nSaveDC);
+LRESULT TransparentList::OnPrintClient(WPARAM wParam, LPARAM lParam) {
+    // 直接调用OnPaint进行绘制
+    CDC* pDC = CDC::FromHandle((HDC)wParam);
+    if (pDC) {
+        OnPaint();
+    }
+    return 0;
+}
+
+void TransparentList::OnNcCalcSize(BOOL bCalcValidRects, NCCALCSIZE_PARAMS* lpncsp)
+{
+    // 直接返回，不计算非客户区
+    //CListCtrl::OnNcCalcSize(bCalcValidRects, lpncsp);
 }

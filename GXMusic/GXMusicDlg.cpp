@@ -67,8 +67,8 @@ void CGXMusicDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_GX_MAIN_MIN, m_MinimizeButton);
 	DDX_Control(pDX, IDC_GX_MAIN_ICON, m_imageIcon);
 	DDX_Control(pDX, IDC_GX_MAIN_TITLE, m_staticTitle);
-	DDX_Control(pDX, IDC_GX_MAIN_BLOCK, m_blockMain);
 	DDX_Control(pDX, IDC_GX_SONG_LIST, m_SongInfoListCtrl);
+	//DDX_Control(pDX, IDC_GX_MAIN_BLOCK, m_blockMain);
 }
 
 BEGIN_MESSAGE_MAP(CGXMusicDlg, CDialogEx)
@@ -76,7 +76,6 @@ BEGIN_MESSAGE_MAP(CGXMusicDlg, CDialogEx)
 	ON_WM_PAINT()
 	ON_WM_QUERYDRAGICON()
 	ON_WM_NCHITTEST()
-	ON_WM_CTLCOLOR()
 	ON_BN_CLICKED(IDC_GX_MAIN_CLOSE, OnMainButtonClicked)	
 	ON_BN_CLICKED(IDC_GX_MAIN_MAX, OnMainButtonClicked)
 	ON_BN_CLICKED(IDC_GX_MAIN_MIN, OnMainButtonClicked)
@@ -84,6 +83,7 @@ BEGIN_MESSAGE_MAP(CGXMusicDlg, CDialogEx)
 	ON_WM_ERASEBKGND()
 	ON_WM_SETCURSOR()
 	ON_WM_SIZE()
+	ON_NOTIFY(NM_DBLCLK, IDC_GX_SONG_LIST, OnMusicListDoubleClick)
 END_MESSAGE_MAP()
 
 
@@ -145,6 +145,7 @@ BOOL CGXMusicDlg::OnInitDialog()
 
 	// Background setting
 	m_backgroundImage.Load(_T(".\\res\\GX_App_Background.png"));
+
 	// 设置窗口区域为圆角
 	CRect rect;
 	GetWindowRect(&rect);
@@ -159,7 +160,11 @@ BOOL CGXMusicDlg::OnInitDialog()
 
 	m_imageIcon.SetImage(_T(".\\res\\GX_Music_Icon.png"));
 
+	ModifyStyle(WS_CLIPCHILDREN, 0);
+
 	InitSongList();
+
+	m_SongInfoListCtrl.SetWindowPos(&m_blockMain, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);
 
 	return TRUE;  // 除非将焦点设置到控件，否则返回 TRUE
 }
@@ -184,8 +189,8 @@ HCURSOR CGXMusicDlg::OnQueryDragIcon()
 
 void CGXMusicDlg::OnPaint()
 {
-	BYTE alpha = 255;	// 0-255
-	SetBackgroundAndTransparency(alpha);
+	//BYTE alpha = 128;	// 0-255
+	//SetBackgroundAndTransparency(alpha);
 	CRect rectClient;
 	GetClientRect(&rectClient);
 
@@ -256,41 +261,20 @@ void CGXMusicDlg::InitSongList()
 	CFont font;
 	CRect listRect;
 
+	m_strCurMusicFilePath = "E:/ceobe/study/GXMusic/GXMusic/musicRes/会呼吸的痛.mp3";
+	m_bPause = false;
+	m_strDefaultDirectoryPath = "E:/ceobe/study/GXMusic/GXMusic/musicRes/*.mp3";
+
 	font.CreatePointFont(250, _T("Arial"));
 
-	m_SongInfoListCtrl.SetExtendedStyle(m_SongInfoListCtrl.GetExtendedStyle() | LVS_EX_TRANSPARENTBKGND);
+	m_SongInfoListCtrl.SetExtendedStyle(m_SongInfoListCtrl.GetExtendedStyle() | LVS_EX_TRANSPARENTBKGND | LVS_EX_FULLROWSELECT | LVS_EX_DOUBLEBUFFER);
 	
 	m_SongInfoListCtrl.SetFont(&font);
 	m_SongInfoListCtrl.SetView(LV_VIEW_DETAILS);
-	m_SongInfoListCtrl.SetExtendedStyle(LVS_EX_FULLROWSELECT);
 
-	m_SongInfoListCtrl.GetClientRect(&listRect);
+	m_vecMusicFilePaths.clear();
 
-	m_SongInfoListCtrl.InsertColumn(0, _T("歌曲名"), LVCFMT_LEFT, listRect.Width() * 0.3);
-	m_SongInfoListCtrl.InsertColumn(1, _T("歌手"), LVCFMT_LEFT, listRect.Width() * 0.3);
-	m_SongInfoListCtrl.InsertColumn(2, _T("专辑"), LVCFMT_LEFT, listRect.Width() * 0.2);
-	m_SongInfoListCtrl.InsertColumn(3, _T("时长"), LVCFMT_LEFT, listRect.Width() * 0.2);
-
-	GXSongInfo song1 = { _T("歌曲1"), _T("歌手1"), _T("专辑1"), _T("3:30") };
-	GXSongInfo song2 = { _T("歌曲2"), _T("歌手2"), _T("专辑2"), _T("4:05") };
-
-	m_SongInfoList.push_back(song1);
-	m_SongInfoList.push_back(song2);
-
-	for (const auto& song : m_SongInfoList)
-	{
-		int nItem = m_SongInfoListCtrl.InsertItem(m_SongInfoListCtrl.GetItemCount(), song.m_title);
-		m_SongInfoListCtrl.SetItemText(nItem, 1, song.m_artist);
-		m_SongInfoListCtrl.SetItemText(nItem, 2, song.m_album);
-		m_SongInfoListCtrl.SetItemText(nItem, 3, song.m_duration);
-	}
-
-
-	//加载自定义Header
-	CHeaderCtrl* pHeader = m_SongInfoListCtrl.GetHeaderCtrl();
-
-	m_listHeaderCtrl.SubclassWindow(pHeader->m_hWnd);
-	
+	LoadDefaultMusics();
 }
 
 LRESULT CGXMusicDlg::OnNcHitTest(CPoint point) {
@@ -437,9 +421,146 @@ void CGXMusicDlg::OnSize(UINT nType, int cx, int cy)
 	}
 }
 
-HBRUSH CGXMusicDlg::OnCtlColor(CDC* pDC, CWnd* pWnd, UINT nCtlColor)
-{
-	HBRUSH hbr = CDialogEx::OnCtlColor(pDC, pWnd, nCtlColor);
+#pragma region music control related
 
-	return hbr;
+static std::string Data2String(TagLib::String str)
+{
+	std::wstring wstr = str.toWString();
+
+	int size = WideCharToMultiByte(CP_ACP, 0, wstr.c_str(), -1, nullptr, 0, nullptr, nullptr);
+	std::string result(size, 0);
+	WideCharToMultiByte(CP_ACP, 0, wstr.c_str(), -1, &result[0], size, nullptr, nullptr);
+	result.pop_back();
+
+	return result;
 }
+
+static std::string Data2String(CString cstr)
+{
+	int size = WideCharToMultiByte(CP_ACP, 0, cstr.GetString(), -1, nullptr, 0, nullptr, nullptr);
+	std::string result(size, 0);
+	WideCharToMultiByte(CP_ACP, 0, cstr.GetString(), -1, &result[0], size, nullptr, nullptr);
+	result.pop_back();
+
+	return result;
+}
+
+HRESULT CGXMusicDlg::LoadDefaultMusics()
+{
+	HRESULT hr = S_OK;
+	std::string strTitle;
+	std::string strArtist;
+	std::string strAlbum;
+	std::string strYear;
+	int duration = 0;
+	CRect rect;
+	int nWidth = 0;
+	int nCounter = 0;
+	CFileFind musicFinder;
+
+	TagLib::ID3v2::FrameFactory::instance()->setDefaultTextEncoding(TagLib::String::UTF8);
+
+	m_SongInfoListCtrl.GetClientRect(&rect);
+
+	BOOL bWorking = musicFinder.FindFile(m_strDefaultDirectoryPath);
+
+	nWidth = (int)(rect.Width() * 0.3);
+	m_SongInfoListCtrl.InsertColumn(0, _T("歌名"), LVCFMT_LEFT, nWidth);
+	nWidth = (int)(rect.Width() * 0.2);
+	m_SongInfoListCtrl.InsertColumn(1, _T("歌手"), LVCFMT_LEFT, nWidth);
+	nWidth = (int)(rect.Width() * 0.2);
+	m_SongInfoListCtrl.InsertColumn(2, _T("专辑"), LVCFMT_LEFT, nWidth);
+	nWidth = (int)(rect.Width() * 0.2);
+	m_SongInfoListCtrl.InsertColumn(3, _T("时长"), LVCFMT_LEFT, nWidth);
+
+	while (bWorking)
+	{
+		bWorking = musicFinder.FindNextFileW();
+
+		if (musicFinder.IsDirectory())
+		{
+			continue;
+		}
+
+		CString cstrFile = musicFinder.GetFilePath();
+		std::string strFile = Data2String(cstrFile);
+
+		if (!strFile.empty())
+		{
+
+			TagLib::FileRef file(strFile.c_str());
+
+			if (!file.isNull() && file.tag())
+			{
+				TagLib::Tag* tag = file.tag();
+
+				strTitle = Data2String(tag->title());
+				strAlbum = Data2String(tag->album());
+				strArtist = Data2String(tag->artist());		
+			}
+			else {
+				std::cerr << "无法读取文件或文件没有有效标签" << std::endl;
+			}
+
+			m_SongInfoListCtrl.InsertItem(nCounter, (CString)strTitle.c_str());
+			m_SongInfoListCtrl.SetItemText(nCounter, 1, (CString)strArtist.c_str());
+			m_SongInfoListCtrl.SetItemText(nCounter, 2, (CString)strAlbum.c_str());
+			m_SongInfoListCtrl.SetItemText(nCounter, 3, L"3:40");
+
+			m_vecMusicFilePaths.push_back(cstrFile);
+
+			nCounter++;
+		}
+	}
+
+	return hr;
+}
+
+void CGXMusicDlg::PlayMusic()
+{
+	std::string openCommand = "open \"" + std::string(CT2A(m_strCurMusicFilePath)) +
+		"\" type mpegvideo alias music";
+	mciSendStringA(openCommand.c_str(), NULL, 0, NULL);
+
+	mciSendStringA("play music", NULL, 0, NULL);
+}
+
+void CGXMusicDlg::PauseOrPlayMusic(bool bPause)
+{
+	if (bPause)
+	{
+		mciSendStringA("stop music", NULL, 0, NULL);
+	}
+	else
+	{
+		mciSendStringA("play music", NULL, 0, NULL);
+	}
+}
+
+void CGXMusicDlg::StopMusic()
+{
+	mciSendStringA("stop music", NULL, 0, NULL);
+	mciSendStringA("close music", NULL, 0, NULL);
+}
+void CGXMusicDlg::SetMusicVolume(int nVolume)
+{
+	std::string cmd = "setaudio music volume to " + std::to_string(nVolume);
+	mciSendStringA(cmd.c_str(), NULL, 0, NULL);
+}
+
+void CGXMusicDlg::OnMusicListDoubleClick(NMHDR* pNMHDR, LRESULT* pResult)
+{
+	NM_LISTVIEW* pNMListView = reinterpret_cast<NM_LISTVIEW*>(pNMHDR);
+
+	int nItem = pNMListView->iItem;  // 获取双击的行号
+	if (nItem != -1) {
+		StopMusic();
+
+		m_strCurMusicFilePath = m_vecMusicFilePaths[nItem];
+
+		PlayMusic();
+	}
+
+	*pResult = 0;
+}
+#pragma endregion
