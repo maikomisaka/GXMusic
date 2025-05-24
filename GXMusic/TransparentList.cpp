@@ -5,7 +5,6 @@ IMPLEMENT_DYNAMIC(TransparentList, CListCtrl)
 
 BEGIN_MESSAGE_MAP(TransparentList, CListCtrl)
     ON_WM_ERASEBKGND()
-    ON_WM_PAINT()
     ON_WM_VSCROLL()
     ON_WM_HSCROLL()
     ON_WM_MOUSEWHEEL()
@@ -39,11 +38,6 @@ void TransparentList::OnNMCustomDraw(NMHDR* pNMHDR, LRESULT* pResult)
         *pResult = CDRF_NEWFONT;
         break;
     }
-}
-
-void TransparentList::OnPaint()
-{
-    CListCtrl::OnPaint();
 }
 
 void TransparentList::PreSubclassWindow()
@@ -98,15 +92,15 @@ void TransparentList::OnHScroll(UINT nSBCode, UINT nPos, CScrollBar* pScrollBar)
 // Êó±ê¹öÂÖ´¦Àí
 BOOL TransparentList::OnMouseWheel(UINT nFlags, short zDelta, CPoint pt)
 {
-    SetRedraw(FALSE);
+    //SetRedraw(FALSE);
     BOOL bResult = CListCtrl::OnMouseWheel(nFlags, zDelta, pt);
-    SetRedraw(TRUE);
-    RedrawWindow(
+    //SetRedraw(TRUE);
+    /*RedrawWindow(
         NULL,
         NULL,
         RDW_INVALIDATE | RDW_UPDATENOW | RDW_ERASE
-    );
-    //GetParent()->SendMessage(WM_USER + 100);
+    );*/
+
     return bResult;
 }
 

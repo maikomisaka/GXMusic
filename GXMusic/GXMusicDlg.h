@@ -43,7 +43,7 @@ public:
 
 private:
 	// for UI degign
-	CImage m_backgroundImage; // 用于加载背景图片
+	Gdiplus::Bitmap* m_pBackgroundBmp = nullptr;
 	CTransparentButton m_CloseButton;
 	CTransparentButton m_MaximizeButton;
 	CTransparentButton m_MinimizeButton;
@@ -72,7 +72,6 @@ private:
 	void SetMusicVolume(int nVolume);
 	HRESULT LoadDefaultMusics();
 
-	void SetBackgroundAndTransparency(BYTE alpha);
 	void InitSongList();
 
 protected:
@@ -85,7 +84,6 @@ protected:
 	// 生成的消息映射函数
 	virtual BOOL OnInitDialog();
 	afx_msg void OnSysCommand(UINT nID, LPARAM lParam);
-	afx_msg void OnPaint();
 	afx_msg HCURSOR OnQueryDragIcon();
 	afx_msg LRESULT OnNcHitTest(CPoint point);
 	afx_msg void OnMainButtonClicked();

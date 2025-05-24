@@ -73,7 +73,6 @@ void CGXMusicDlg::DoDataExchange(CDataExchange* pDX)
 
 BEGIN_MESSAGE_MAP(CGXMusicDlg, CDialogEx)
 	ON_WM_SYSCOMMAND()
-	ON_WM_PAINT()
 	ON_WM_QUERYDRAGICON()
 	ON_WM_NCHITTEST()
 	ON_BN_CLICKED(IDC_GX_MAIN_CLOSE, OnMainButtonClicked)	
@@ -144,7 +143,7 @@ BOOL CGXMusicDlg::OnInitDialog()
 	GetClientRect(&m_initialDialogRect);
 
 	// Background setting
-	m_backgroundImage.Load(_T(".\\res\\GX_App_Background.png"));
+	m_pBackgroundBmp = Gdiplus::Bitmap::FromFile(L".\\res\\GX_App_Background.png");
 
 	// 设置窗口区域为圆角
 	CRect rect;
@@ -185,75 +184,6 @@ void CGXMusicDlg::OnSysCommand(UINT nID, LPARAM lParam)
 HCURSOR CGXMusicDlg::OnQueryDragIcon()
 {
 	return static_cast<HCURSOR>(m_hIcon);
-}
-
-void CGXMusicDlg::OnPaint()
-{
-	//BYTE alpha = 128;	// 0-255
-	//SetBackgroundAndTransparency(alpha);
-	CRect rectClient;
-	GetClientRect(&rectClient);
-
-	CPaintDC dc(this); // 用于绘制的设备上下文
-	if (!m_backgroundImage.IsNull())
-	{
-		int imgWidth = m_backgroundImage.GetWidth();
-		int imgHeight = m_backgroundImage.GetHeight();
-		int dlgWidth = rectClient.Width();
-		int dlgHeight = rectClient.Height();
-
-		float imgAspect = static_cast<float>(imgWidth) / imgHeight;
-		float dlgAspect = static_cast<float>(dlgWidth) / dlgHeight;
-
-		CRect sourceRect;
-		if (imgAspect > dlgAspect)
-		{
-			int newWidth = static_cast<int>(imgHeight * dlgAspect);
-			int offsetX = (imgWidth - newWidth) / 2;
-			sourceRect = CRect(offsetX, 0, offsetX + newWidth, imgHeight);
-		}
-		else
-		{
-			int newHeight = static_cast<int>(imgWidth / dlgAspect);
-			int offsetY = (imgHeight - newHeight) / 2;
-			sourceRect = CRect(0, offsetY, imgWidth, offsetY + newHeight);
-		}
-
-		m_backgroundImage.StretchBlt(dc.m_hDC, rectClient, sourceRect, SRCCOPY);
-	}
-}
-
-void CGXMusicDlg::SetBackgroundAndTransparency(BYTE alpha)
-{
-	CPaintDC dc(this); // device context for painting
-
-	// 获取客户区尺寸
-	CRect rect;
-	GetClientRect(&rect);
-
-	// 创建一个内存 DC
-	CDC memDC;
-	memDC.CreateCompatibleDC(&dc);
-
-	// 创建一个兼容的位图
-	CBitmap bmp;
-	bmp.CreateCompatibleBitmap(&dc, rect.Width(), rect.Height());
-	CBitmap* pOldBmp = memDC.SelectObject(&bmp);
-
-	// 绘制背景图片
-	m_backgroundImage.Draw(memDC.GetSafeHdc(), 0, 0, rect.Width(), rect.Height());
-
-	// 设置透明度（假设透明度为 128，即 50% 透明）
-	BLENDFUNCTION bf;
-	bf.BlendOp = AC_SRC_OVER;
-	bf.BlendFlags = 0;
-	bf.SourceConstantAlpha = alpha; // 透明度值 (0-255)
-	bf.AlphaFormat = 0;
-
-	// 将内存 DC 中的内容拷贝到屏幕 DC
-	dc.AlphaBlend(0, 0, rect.Width(), rect.Height(), &memDC, 0, 0, rect.Width(), rect.Height(), bf);
-
-	memDC.SelectObject(pOldBmp);
 }
 
 void CGXMusicDlg::InitSongList()
@@ -332,30 +262,18 @@ void CGXMusicDlg::OnGetMinMaxInfo(MINMAXINFO* lpMMI)
 
 BOOL CGXMusicDlg::OnEraseBkgnd(CDC* pDC)
 {
-	CRect rect;
-	GetClientRect(rect);
+	if (m_pBackgroundBmp) {
+		CRect rect;
+		GetClientRect(&rect);
 
-	// 使用 AlphaBlend 绘制透明 PNG
-	BLENDFUNCTION blend = { 0 };
-	blend.BlendOp = AC_SRC_OVER;
-	blend.SourceConstantAlpha = 255;  // 不透明度
-	blend.AlphaFormat = AC_SRC_ALPHA; // 启用 Alpha 通道
-
-	CDC memDC;
-	memDC.CreateCompatibleDC(pDC);
-	HBITMAP hOldBmp = (HBITMAP)memDC.SelectObject(CBitmap::FromHandle(m_backgroundImage));
-
-	pDC->AlphaBlend(
-		0, 0, rect.Width(), rect.Height(),
-		&memDC,
-		0, 0, m_backgroundImage.GetWidth(), m_backgroundImage.GetHeight(),
-		blend
-	);
-
-	memDC.SelectObject(hOldBmp);
-
-
-	return TRUE;
+		Gdiplus::Graphics graphics(pDC->GetSafeHdc());
+		graphics.DrawImage(m_pBackgroundBmp,
+			Gdiplus::Rect(0, 0, rect.Width(), rect.Height()),
+			0, 0, m_pBackgroundBmp->GetWidth(), m_pBackgroundBmp->GetHeight(),
+			Gdiplus::UnitPixel);
+		return TRUE;
+	}
+	return CDialogEx::OnEraseBkgnd(pDC);
 }
 
 BOOL CGXMusicDlg::OnSetCursor(CWnd* pWnd, UINT nHitTest, UINT message)
