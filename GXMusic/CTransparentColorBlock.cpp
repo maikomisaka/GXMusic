@@ -7,7 +7,7 @@ BEGIN_MESSAGE_MAP(CTransparentColorBlock, CStatic)
 END_MESSAGE_MAP()
 
 CTransparentColorBlock::CTransparentColorBlock()
-    : m_color(RGB(255, 255, 255)), // 默认黑色
+    : m_color(RGB(255, 255, 255)),
     m_opacity(22) // 默认不透明度为128，半透明
 {}
 

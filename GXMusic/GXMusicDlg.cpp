@@ -139,6 +139,9 @@ BOOL CGXMusicDlg::OnInitDialog()
 		GetDlgItem(id)->GetWindowRect(&rect);
 		ScreenToClient(&rect);
 		m_vecScaleControlRects.push_back(rect);
+
+		Gdiplus::Rect gdiRect(rect.left, rect.top, rect.Width(), rect.Height());
+		m_vecTransparentBlockRects.push_back(gdiRect);
 	}
 	GetClientRect(&m_initialDialogRect);
 
@@ -267,10 +270,18 @@ BOOL CGXMusicDlg::OnEraseBkgnd(CDC* pDC)
 		GetClientRect(&rect);
 
 		Gdiplus::Graphics graphics(pDC->GetSafeHdc());
+		Gdiplus::SolidBrush transparentBrush(Gdiplus::Color(m_opacity, 255, 255, 255));
+
 		graphics.DrawImage(m_pBackgroundBmp,
 			Gdiplus::Rect(0, 0, rect.Width(), rect.Height()),
 			0, 0, m_pBackgroundBmp->GetWidth(), m_pBackgroundBmp->GetHeight(),
 			Gdiplus::UnitPixel);
+
+		// 绘制透明层
+		for (auto& rect : m_vecTransparentBlockRects)
+		{
+			graphics.FillRectangle(&transparentBrush, rect);
+		}
 		return TRUE;
 	}
 	return CDialogEx::OnEraseBkgnd(pDC);

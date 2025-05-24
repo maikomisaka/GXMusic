@@ -56,6 +56,8 @@ private:
 	std::vector<int> m_vecControlIDs;
 	std::vector<CRect> m_vecScaleControlRects;
 	std::vector<int> m_vecScaleControlIDs;
+	std::vector<Gdiplus::Rect> m_vecTransparentBlockRects;
+	int m_opacity = 25;
 	CRect m_initialDialogRect;
 
 	std::vector<GXSongInfo> m_SongInfoList;

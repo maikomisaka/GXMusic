@@ -1,5 +1,4 @@
 #pragma once
-#include "CTransparentScrollBar.h"
 #include "CTransparentHeaderCtrl.h"
 
 class TransparentList : public CListCtrl

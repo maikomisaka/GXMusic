@@ -76,6 +76,18 @@ void CTransparentHeaderCtrl::DrawHeaderText(CDC* pDC)
     Gdiplus::Font font(L"Arial", 18, Gdiplus::FontStyleBold, Gdiplus::UnitPixel);
     Gdiplus::SolidBrush textBrush(Gdiplus::Color(255, 255, 255, 255));
 
+    // 绘制透明层
+    CRect rectHeader;
+    Gdiplus::SolidBrush transparentBrush(Gdiplus::Color(25, 255, 255, 255));
+    GetClientRect(&rectHeader);
+    graphics.FillRectangle(
+        &transparentBrush, 
+        rectHeader.left, 
+        rectHeader.top, 
+        rectHeader.Width(),
+        rectHeader.Height()
+    );
+
     int nItems = GetItemCount();
     for (int i = 0; i < nItems; ++i)
     {
@@ -101,10 +113,6 @@ void CTransparentHeaderCtrl::DrawHeaderText(CDC* pDC)
         // 创建对齐格式（垂直居中）
         Gdiplus::StringFormat format;
         format.SetLineAlignment(Gdiplus::StringAlignmentCenter); // 垂直居中
-
-        // 绘制透明层
-        //Gdiplus::SolidBrush transparentBrush(Gdiplus::Color(128, 255, 255, 255));
-        //graphics.FillRectangle(&transparentBrush, gdiRect);
 
         graphics.DrawString(
             CStringW(szText), -1, &font, gdiRect,
