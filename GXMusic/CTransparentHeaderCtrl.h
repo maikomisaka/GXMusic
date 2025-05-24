@@ -19,6 +19,6 @@ public:
     afx_msg BOOL OnSetCursor(CWnd* pWnd, UINT nHitTest, UINT message);
 
 private:
-    void DrawHeaderText(Gdiplus::Graphics& graphics);           // 文字绘制
+    void DrawHeaderText(CDC* pDC);           // 文字绘制
 };
 

@@ -8,7 +8,6 @@
 #define IDD_GXMUSIC_DIALOG              102
 #define IDR_MAINFRAME                   128
 #define IDB_PNG1                        131
-#define IDB_BITMAP1                     132
 #define IDB_GX_MAIN_BACKGROUND          132
 #define IDC_GX_MAIN_CLOSE               200
 #define IDB_GX_MAIN_CLOSE               201

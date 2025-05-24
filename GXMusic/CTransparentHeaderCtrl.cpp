@@ -21,17 +21,60 @@ BOOL CTransparentHeaderCtrl::OnEraseBkgnd(CDC* pDC)
 void CTransparentHeaderCtrl::OnPaint()
 {
     CPaintDC dc(this);
-    Gdiplus::Graphics graphics(dc.m_hDC);
+    CDC memDC;
+    CBitmap memBitmap;
+    CRect rectHeader;
+    CRect rectDialog;
+    CRect rectHeaderInDialog;
+    CWnd* pListCtrl = NULL;
+    CWnd* pDialog = NULL;
+
+    GetClientRect(&rectHeader);
+
+    // 创建内存DC用于双缓冲
+    memDC.CreateCompatibleDC(&dc);
+    memBitmap.CreateCompatibleBitmap(&dc, rectHeader.Width(), rectHeader.Height());
+    memDC.SelectObject(&memBitmap);
+
+    // 创建临时的GDI+ Bitmap
+    Gdiplus::Bitmap gdiBitmap(L".\\res\\GX_App_Background.png");
+    Gdiplus::Graphics graphics(memDC.GetSafeHdc());
+
+
+    // 计算标题栏区域在原始位图中对应的背景
+    pListCtrl = GetParent();
+    pDialog = pListCtrl->GetParent();
+    GetWindowRect(&rectHeaderInDialog);
+    pDialog->ScreenToClient(&rectHeaderInDialog);
+    pDialog->GetClientRect(&rectDialog);
+
+    double scaleX = gdiBitmap.GetWidth() * 1.0 / rectDialog.Width();
+    double scaleY = gdiBitmap.GetHeight() * 1.0 / rectDialog.Height();
+    int srcX = (int)((rectHeaderInDialog.left - rectDialog.left) * scaleX);
+    int srcY = (int)((rectHeaderInDialog.top - rectDialog.top) * scaleY);
+    int srcWidth = (int)(rectHeader.Width() * scaleX);
+    int srcHeight = (int)(rectHeader.Height() * scaleY);
+    
+    // 绘制标题栏区域的背景
+    graphics.DrawImage(
+        &gdiBitmap,
+        Gdiplus::Rect(0, 0, rectHeader.Width(), rectHeader.Height()),
+        srcX, srcY, srcWidth, srcHeight,
+        Gdiplus::UnitPixel
+    );
 
     // 绘制标题文字
-    DrawHeaderText(graphics);
+    DrawHeaderText(&memDC);
+
+    dc.BitBlt(0, 0, rectHeader.Width(), rectHeader.Height(), &memDC, 0, 0, SRCCOPY);
 }
 
-void CTransparentHeaderCtrl::DrawHeaderText(Gdiplus::Graphics& graphics)
+void CTransparentHeaderCtrl::DrawHeaderText(CDC* pDC)
 {
+    Gdiplus::Graphics graphics(pDC->GetSafeHdc());
     // 绘制透明文本（带抗锯齿）
     Gdiplus::Font font(L"Arial", 18, Gdiplus::FontStyleBold, Gdiplus::UnitPixel);
-    Gdiplus::SolidBrush textBrush(Gdiplus::Color(255, 255, 255));
+    Gdiplus::SolidBrush textBrush(Gdiplus::Color(255, 255, 255, 255));
 
     int nItems = GetItemCount();
     for (int i = 0; i < nItems; ++i)
@@ -39,7 +82,7 @@ void CTransparentHeaderCtrl::DrawHeaderText(Gdiplus::Graphics& graphics)
         CRect itemRect;
         GetItemRect(i, &itemRect);
 
-        TCHAR szText[256];
+        TCHAR szText[256] = { 0 };
         HDITEM hdi = { HDI_TEXT };
         hdi.pszText = szText;
         hdi.cchTextMax = _countof(szText);
@@ -58,6 +101,10 @@ void CTransparentHeaderCtrl::DrawHeaderText(Gdiplus::Graphics& graphics)
         // 创建对齐格式（垂直居中）
         Gdiplus::StringFormat format;
         format.SetLineAlignment(Gdiplus::StringAlignmentCenter); // 垂直居中
+
+        // 绘制透明层
+        //Gdiplus::SolidBrush transparentBrush(Gdiplus::Color(128, 255, 255, 255));
+        //graphics.FillRectangle(&transparentBrush, gdiRect);
 
         graphics.DrawString(
             CStringW(szText), -1, &font, gdiRect,
