@@ -42,9 +42,6 @@
     <ClInclude Include="TransparentStatic.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="CTransparentColorBlock.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
     <ClInclude Include="TransparentList.h">
       <Filter>头文件</Filter>
     </ClInclude>
@@ -69,9 +66,6 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="TransparentStatic.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="CTransparentColorBlock.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="TransparentList.cpp">

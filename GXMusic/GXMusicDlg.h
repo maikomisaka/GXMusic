@@ -5,7 +5,6 @@
 #include "TransparentButton.h"
 #include "TransparentImage.h"
 #include "TransparentStatic.h"
-#include "CTransparentColorBlock.h"
 #include "TransparentList.h"
 #include "CTransparentHeaderCtrl.h"
 
@@ -51,7 +50,6 @@ private:
 	HCURSOR m_hHandCursor;  // 手形光标
 	TransparentImage m_imageIcon;
 	TransparentStatic m_staticTitle; // GX Music
-	CTransparentColorBlock m_blockMain;
 	std::vector<CRect> m_vecControlRects;
 	std::vector<int> m_vecControlIDs;
 	std::vector<CRect> m_vecScaleControlRects;

@@ -166,8 +166,6 @@ BOOL CGXMusicDlg::OnInitDialog()
 
 	InitSongList();
 
-	m_SongInfoListCtrl.SetWindowPos(&m_blockMain, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE);
-
 	return TRUE;  // 除非将焦点设置到控件，否则返回 TRUE
 }
 
