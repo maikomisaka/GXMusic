@@ -328,7 +328,7 @@ void CGXMusicDlg::OnSize(UINT nType, int cx, int cy)
 			rcNew.right = rcNew.left + m_vecControlRects[i].Width();
 			rcNew.bottom = rcNew.top + m_vecControlRects[i].Height();
 
-			GetDlgItem(m_vecControlIDs[i])->MoveWindow(rcNew);
+			GetDlgItem(m_vecControlIDs[i])->MoveWindow(rcNew, FALSE);
 		}
 		// 调整控件的位置和大小
 		for (size_t i = 0; i < m_vecScaleControlIDs.size(); ++i)
@@ -341,7 +341,7 @@ void CGXMusicDlg::OnSize(UINT nType, int cx, int cy)
 			rcNew.right = static_cast<int>(m_vecScaleControlRects[i].right * widthRatio);
 			rcNew.bottom = static_cast<int>(m_vecScaleControlRects[i].bottom * heightRatio);
 
-			GetDlgItem(m_vecScaleControlIDs[i])->MoveWindow(rcNew);
+			GetDlgItem(m_vecScaleControlIDs[i])->MoveWindow(rcNew, FALSE);
 		}
 
 		Invalidate();
