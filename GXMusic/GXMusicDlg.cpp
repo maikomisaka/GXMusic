@@ -308,7 +308,14 @@ void CGXMusicDlg::OnSize(UINT nType, int cx, int cy)
 	if (nType != SIZE_MINIMIZED)
 	{
 		// 更新窗口区域为圆角
-		SetWindowRgn(CreateRoundRectRgn(0, 0, cx, cy, 20, 20), TRUE);
+		if (nType != SIZE_MAXIMIZED)
+		{
+			SetWindowRgn(CreateRoundRectRgn(0, 0, cx, cy, 20, 20), TRUE);
+		}
+		else
+		{
+			SetWindowRgn(NULL, TRUE); // 最大化时移除圆角
+		}
 
 		CRect rectClient;
 		GetClientRect(&rectClient);
