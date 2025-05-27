@@ -22,6 +22,7 @@
 #define IDC_GX_MAIN_TITLE               210
 #define IDC_GX_MAIN_BLOCK               211
 #define IDC_GX_SONG_LIST                212
+#define IDC_GX_PLAYER_CONTROL_BLOCK		213
 
 // Next default values for new objects
 // 

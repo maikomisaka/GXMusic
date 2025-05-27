@@ -132,7 +132,8 @@ BOOL CGXMusicDlg::OnInitDialog()
 		m_vecControlRects.push_back(rect);
 	}
 	m_vecScaleControlIDs = {
-		IDC_GX_MAIN_BLOCK
+		IDC_GX_MAIN_BLOCK,
+		IDC_GX_PLAYER_CONTROL_BLOCK
 	};
 	for (int id : m_vecScaleControlIDs) {
 		CRect rect;
@@ -276,9 +277,9 @@ BOOL CGXMusicDlg::OnEraseBkgnd(CDC* pDC)
 			Gdiplus::UnitPixel);
 
 		// 绘制透明层
-		for (auto& rect : m_vecTransparentBlockRects)
+		for (auto& block : m_vecTransparentBlockRects)
 		{
-			graphics.FillRectangle(&transparentBrush, rect);
+			graphics.FillRectangle(&transparentBrush, block);
 		}
 		return TRUE;
 	}
