@@ -379,6 +379,31 @@ static std::string Data2String(CString cstr)
 	return result;
 }
 
+static std::string GetMusicDuration(const TagLib::FileRef& file)
+{
+	std::string strTime, strMinute, strSecond;
+	int totalSeconds = 0;
+	int minutes = 0;
+	int seconds = 0;
+
+	TagLib::AudioProperties* audioProps = file.audioProperties();
+
+	if (!audioProps) {
+		std::cerr << "Error: No audio properties found." << std::endl;
+		goto wrapup;
+	}
+
+	totalSeconds = audioProps->lengthInSeconds();
+	minutes = totalSeconds / 60;
+	seconds = totalSeconds % 60;
+
+	strMinute = minutes < 10 ? ("0" + std::to_string(minutes)) : std::to_string(minutes);
+	strSecond = seconds < 10 ? ("0" + std::to_string(seconds)) : std::to_string(seconds);
+	strTime = strMinute + ":" + strSecond;
+wrapup:
+	return strTime;
+}
+
 HRESULT CGXMusicDlg::LoadDefaultMusics()
 {
 	HRESULT hr = S_OK;
@@ -386,7 +411,7 @@ HRESULT CGXMusicDlg::LoadDefaultMusics()
 	std::string strArtist;
 	std::string strAlbum;
 	std::string strYear;
-	int duration = 0;
+	std::string strTime;
 	CRect rect;
 	int nWidth = 0;
 	int nCounter = 0;
@@ -400,11 +425,11 @@ HRESULT CGXMusicDlg::LoadDefaultMusics()
 
 	nWidth = (int)(rect.Width() * 0.3);
 	m_SongInfoListCtrl.InsertColumn(0, _T("歌名"), LVCFMT_LEFT, nWidth);
-	nWidth = (int)(rect.Width() * 0.2);
+	nWidth = (int)(rect.Width() * 0.3);
 	m_SongInfoListCtrl.InsertColumn(1, _T("歌手"), LVCFMT_LEFT, nWidth);
-	nWidth = (int)(rect.Width() * 0.2);
+	nWidth = (int)(rect.Width() * 0.3);
 	m_SongInfoListCtrl.InsertColumn(2, _T("专辑"), LVCFMT_LEFT, nWidth);
-	nWidth = (int)(rect.Width() * 0.2);
+	nWidth = (int)(rect.Width() * 0.1);
 	m_SongInfoListCtrl.InsertColumn(3, _T("时长"), LVCFMT_LEFT, nWidth);
 
 	while (bWorking)
@@ -431,6 +456,7 @@ HRESULT CGXMusicDlg::LoadDefaultMusics()
 				strTitle = Data2String(tag->title());
 				strAlbum = Data2String(tag->album());
 				strArtist = Data2String(tag->artist());		
+				strTime = GetMusicDuration(file);
 			}
 			else {
 				std::cerr << "无法读取文件或文件没有有效标签" << std::endl;
@@ -439,7 +465,7 @@ HRESULT CGXMusicDlg::LoadDefaultMusics()
 			m_SongInfoListCtrl.InsertItem(nCounter, (CString)strTitle.c_str());
 			m_SongInfoListCtrl.SetItemText(nCounter, 1, (CString)strArtist.c_str());
 			m_SongInfoListCtrl.SetItemText(nCounter, 2, (CString)strAlbum.c_str());
-			m_SongInfoListCtrl.SetItemText(nCounter, 3, L"3:40");
+			m_SongInfoListCtrl.SetItemText(nCounter, 3, (CString)strTime.c_str());
 
 			m_vecMusicFilePaths.push_back(cstrFile);
 
