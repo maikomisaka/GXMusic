@@ -30,13 +30,60 @@ void TransparentList::OnNMCustomDraw(NMHDR* pNMHDR, LRESULT* pResult)
         break;
 
     case CDDS_ITEMPREPAINT:
-        // 设置透明背景和文本颜色
-        pLVCD->clrText = RGB(255, 255, 255); // 白色文本
-        pLVCD->clrTextBk = CLR_NONE;         // 透明背景
+    {
+        // 创建GDI+绘图对象
+        Gdiplus::Graphics graphics(pLVCD->nmcd.hdc);
+        int nItem = static_cast<int>(pLVCD->nmcd.dwItemSpec);
 
-        // 不跳过默认绘制！允许系统绘制文本
-        *pResult = CDRF_NEWFONT;
+        // 获取绘制区域
+        CRect rcItem;
+        GetItemRect(pLVCD->nmcd.dwItemSpec, &rcItem, LVIR_BOUNDS);
+        Gdiplus::Rect gdiRect(rcItem.left, rcItem.top, rcItem.Width(), rcItem.Height());
+
+        // 判断选中状态
+        BOOL bSelected = GetItemState(nItem, LVIS_SELECTED) & LVIS_SELECTED;
+
+        // 绘制透明背景
+        if (bSelected)
+        {
+            Gdiplus::Color translucentColor(22, 255, 255, 255);
+            Gdiplus::SolidBrush brush(translucentColor);
+            graphics.FillRectangle(&brush, gdiRect);
+        }
+
+        // 绘制文本
+        Gdiplus::Font font(L"Arial", 18, Gdiplus::FontStyleBold, Gdiplus::UnitPixel);
+        Gdiplus::SolidBrush textBrush(Gdiplus::Color(255, 255, 255, 255));
+
+        // 创建对齐格式（垂直居中）
+        Gdiplus::StringFormat format;
+        format.SetLineAlignment(Gdiplus::StringAlignmentCenter); // 垂直居中
+
+        int nColCount = m_listHeaderCtrl.GetItemCount();
+
+        for (int ii = 0; ii < nColCount; ii++)
+        {
+            CRect rcCol;           
+            CString strText = GetItemText(nItem, ii);
+
+            GetSubItemRect(nItem, ii, LVIR_LABEL, rcCol);
+
+            Gdiplus::RectF textRect(
+                rcCol.left,
+                rcCol.top,
+                rcCol.Width(),
+                rcCol.Height()
+            );
+
+            graphics.DrawString(
+                strText.GetString(), -1, &font, textRect,
+                &format, &textBrush
+            );
+        }       
+
+        *pResult = CDRF_SKIPDEFAULT; // 跳过默认绘制
         break;
+    }
     }
 }
 
