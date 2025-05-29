@@ -68,7 +68,9 @@ void CGXMusicDlg::DoDataExchange(CDataExchange* pDX)
 	DDX_Control(pDX, IDC_GX_MAIN_ICON, m_imageIcon);
 	DDX_Control(pDX, IDC_GX_MAIN_TITLE, m_staticTitle);
 	DDX_Control(pDX, IDC_GX_SONG_LIST, m_SongInfoListCtrl);
-	//DDX_Control(pDX, IDC_GX_MAIN_BLOCK, m_blockMain);
+	DDX_Control(pDX, IDC_GX_MAIN_PLAY_OR_PAUSE, m_PlayOrPauseButton);
+	DDX_Control(pDX, IDC_GX_MAIN_LAST_SONG, m_LastSongButton);
+	DDX_Control(pDX, IDC_GX_MAIN_NEXT_SONG, m_NextSongButton);
 }
 
 BEGIN_MESSAGE_MAP(CGXMusicDlg, CDialogEx)
@@ -78,6 +80,9 @@ BEGIN_MESSAGE_MAP(CGXMusicDlg, CDialogEx)
 	ON_BN_CLICKED(IDC_GX_MAIN_CLOSE, OnMainButtonClicked)	
 	ON_BN_CLICKED(IDC_GX_MAIN_MAX, OnMainButtonClicked)
 	ON_BN_CLICKED(IDC_GX_MAIN_MIN, OnMainButtonClicked)
+	ON_BN_CLICKED(IDC_GX_MAIN_PLAY_OR_PAUSE, OnMainButtonClicked)
+	ON_BN_CLICKED(IDC_GX_MAIN_LAST_SONG, OnMainButtonClicked)
+	ON_BN_CLICKED(IDC_GX_MAIN_NEXT_SONG, OnMainButtonClicked)
 	ON_WM_GETMINMAXINFO()
 	ON_WM_ERASEBKGND()
 	ON_WM_SETCURSOR()
@@ -161,6 +166,13 @@ BOOL CGXMusicDlg::OnInitDialog()
 	m_MinimizeButton.SetNormalImage(IDB_GX_MAIN_MIN);
 	m_MinimizeButton.SetHoverImage(IDB_GX_MAIN_MIN_HOVER);
 
+	m_PlayOrPauseButton.SetNormalImage(IDB_GX_MAIN_PLAY);
+	m_PlayOrPauseButton.SetHoverImage(IDB_GX_MAIN_PLAY);
+	m_LastSongButton.SetNormalImage(IDB_GX_MAIN_LAST_SONG);
+	m_LastSongButton.SetHoverImage(IDB_GX_MAIN_LAST_SONG);
+	m_NextSongButton.SetNormalImage(IDB_GX_MAIN_NEXT_SONG);
+	m_NextSongButton.SetHoverImage(IDB_GX_MAIN_NEXT_SONG);
+
 	m_imageIcon.SetImage(_T(".\\res\\GX_Music_Icon.png"));
 
 	ModifyStyle(WS_CLIPCHILDREN, 0);
@@ -194,7 +206,7 @@ void CGXMusicDlg::InitSongList()
 	CRect listRect;
 
 	m_strCurMusicFilePath = "E:/ceobe/study/GXMusic/GXMusic/musicRes/会呼吸的痛.mp3";
-	m_bPause = false;
+	m_bPause = true;
 	m_strDefaultDirectoryPath = "E:/ceobe/study/GXMusic/GXMusic/musicRes/*.mp3";
 
 	font.CreatePointFont(250, _T("Arial"));
@@ -228,6 +240,8 @@ void CGXMusicDlg::OnMainButtonClicked()
 {
 	CWnd* pWnd = GetFocus();
 	UINT nID = pWnd->GetDlgCtrlID();
+	int nNumOfSongs = m_vecMusicFilePaths.size();
+
 	if (nID == IDC_GX_MAIN_CLOSE) {
 		EndDialog(IDCANCEL);
 	}
@@ -244,6 +258,46 @@ void CGXMusicDlg::OnMainButtonClicked()
 	}
 	else if (nID == IDC_GX_MAIN_MIN) {
 		ShowWindow(SW_MINIMIZE);
+	}
+	else if (nID == IDC_GX_MAIN_PLAY_OR_PAUSE)
+	{
+		m_bPause = !m_bPause;
+
+		PauseOrPlayMusic(m_bPause);
+	}
+	else if (nID == IDC_GX_MAIN_LAST_SONG)
+	{
+		if (m_nCurMusicIndex > 0)
+		{
+			m_nCurMusicIndex--;
+		}
+		else
+		{
+			m_nCurMusicIndex = nNumOfSongs - 1;
+		}
+
+		StopMusic();
+
+		m_strCurMusicFilePath = m_vecMusicFilePaths[m_nCurMusicIndex];
+
+		PlayMusic();
+	}
+	else if (nID == IDC_GX_MAIN_NEXT_SONG)
+	{
+		if (m_nCurMusicIndex == nNumOfSongs - 1)
+		{
+			m_nCurMusicIndex = 0;
+		}
+		else
+		{
+			m_nCurMusicIndex++;
+		}
+
+		StopMusic();
+
+		m_strCurMusicFilePath = m_vecMusicFilePaths[m_nCurMusicIndex];
+
+		PlayMusic();
 	}
 }
 
@@ -513,11 +567,11 @@ void CGXMusicDlg::OnMusicListDoubleClick(NMHDR* pNMHDR, LRESULT* pResult)
 {
 	NM_LISTVIEW* pNMListView = reinterpret_cast<NM_LISTVIEW*>(pNMHDR);
 
-	int nItem = pNMListView->iItem;  // 获取双击的行号
-	if (nItem != -1) {
+	m_nCurMusicIndex = pNMListView->iItem;  // 获取双击的行号
+	if (m_nCurMusicIndex != -1) {
 		StopMusic();
 
-		m_strCurMusicFilePath = m_vecMusicFilePaths[nItem];
+		m_strCurMusicFilePath = m_vecMusicFilePaths[m_nCurMusicIndex];
 
 		PlayMusic();
 	}

@@ -107,5 +107,11 @@
     <Image Include="res\GX_App_Minimize_Hover.png">
       <Filter>资源文件</Filter>
     </Image>
+    <Image Include="res\GX_App_Pause.png">
+      <Filter>资源文件</Filter>
+    </Image>
+    <Image Include="res\GX_App_Background.bmp">
+      <Filter>资源文件</Filter>
+    </Image>
   </ItemGroup>
 </Project>

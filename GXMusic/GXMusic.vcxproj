@@ -219,12 +219,14 @@
   </ItemGroup>
   <ItemGroup>
     <Image Include="res\GXMusic.ico" />
+    <Image Include="res\GX_App_Background.bmp" />
     <Image Include="res\GX_App_Close.png" />
     <Image Include="res\GX_App_Close_Hover.png" />
     <Image Include="res\GX_App_Maximize.png" />
     <Image Include="res\GX_App_Maximize_Hover.png" />
     <Image Include="res\GX_App_Minimize.png" />
     <Image Include="res\GX_App_Minimize_Hover.png" />
+    <Image Include="res\GX_App_Pause.png" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

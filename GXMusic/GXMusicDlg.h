@@ -65,6 +65,11 @@ private:
 	bool m_bPause;
 	CString m_strDefaultDirectoryPath;
 	std::vector<CString> m_vecMusicFilePaths;
+	int m_nCurMusicIndex = -1;
+
+	CTransparentButton m_PlayOrPauseButton;
+	CTransparentButton m_LastSongButton;
+	CTransparentButton m_NextSongButton;	
 
 	void PlayMusic();
 	void PauseOrPlayMusic(bool bPause);

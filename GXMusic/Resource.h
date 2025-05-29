@@ -22,15 +22,22 @@
 #define IDC_GX_MAIN_TITLE               210
 #define IDC_GX_MAIN_BLOCK               211
 #define IDC_GX_SONG_LIST                212
-#define IDC_GX_PLAYER_CONTROL_BLOCK		213
+#define IDC_GX_PLAYER_CONTROL_BLOCK     213
+#define IDC_GX_MAIN_PLAY_OR_PAUSE		214
+#define IDB_GX_MAIN_PLAY				215
+#define IDB_GX_MAIN_PAUSE				216
+#define IDB_GX_MAIN_NEXT_SONG			217
+#define IDB_GX_MAIN_LAST_SONG			218
+#define IDC_GX_MAIN_NEXT_SONG			219
+#define IDC_GX_MAIN_LAST_SONG			220
 
 // Next default values for new objects
 // 
 #ifdef APSTUDIO_INVOKED
 #ifndef APSTUDIO_READONLY_SYMBOLS
-#define _APS_NEXT_RESOURCE_VALUE        133
+#define _APS_NEXT_RESOURCE_VALUE        136
 #define _APS_NEXT_COMMAND_VALUE         32771
-#define _APS_NEXT_CONTROL_VALUE         1006
+#define _APS_NEXT_CONTROL_VALUE         1007
 #define _APS_NEXT_SYMED_VALUE           101
 #endif
 #endif
