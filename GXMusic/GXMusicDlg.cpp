@@ -263,7 +263,14 @@ void CGXMusicDlg::OnMainButtonClicked()
 	{
 		m_bPause = !m_bPause;
 
-		PauseOrPlayMusic(m_bPause);
+		if (m_nCurMusicIndex == -1 && !m_bPause)
+		{
+			PlayMusic();
+		}
+		else
+		{
+			PauseOrPlayMusic(m_bPause);
+		}		
 	}
 	else if (nID == IDC_GX_MAIN_LAST_SONG)
 	{
@@ -533,11 +540,20 @@ HRESULT CGXMusicDlg::LoadDefaultMusics()
 
 void CGXMusicDlg::PlayMusic()
 {
+	if (m_nCurMusicIndex == -1)
+	{
+		m_nCurMusicIndex = 0;
+	}
+
+	m_strCurMusicFilePath = m_vecMusicFilePaths[m_nCurMusicIndex];
+
 	std::string openCommand = "open \"" + std::string(CT2A(m_strCurMusicFilePath)) +
 		"\" type mpegvideo alias music";
 	mciSendStringA(openCommand.c_str(), NULL, 0, NULL);
 
 	mciSendStringA("play music", NULL, 0, NULL);
+
+	m_bPause = false;
 }
 
 void CGXMusicDlg::PauseOrPlayMusic(bool bPause)
@@ -556,6 +572,8 @@ void CGXMusicDlg::StopMusic()
 {
 	mciSendStringA("stop music", NULL, 0, NULL);
 	mciSendStringA("close music", NULL, 0, NULL);
+
+	m_bPause = true;
 }
 void CGXMusicDlg::SetMusicVolume(int nVolume)
 {
